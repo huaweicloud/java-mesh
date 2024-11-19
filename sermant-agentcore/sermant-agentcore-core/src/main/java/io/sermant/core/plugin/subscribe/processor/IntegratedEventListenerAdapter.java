@@ -17,6 +17,7 @@
 
 package io.sermant.core.plugin.subscribe.processor;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.service.dynamicconfig.common.DynamicConfigEvent;
 import io.sermant.core.service.dynamicconfig.common.DynamicConfigListener;
 
@@ -43,7 +44,7 @@ public class IntegratedEventListenerAdapter implements DynamicConfigListener {
     public IntegratedEventListenerAdapter(ConfigProcessor processor, String rawGroup) {
         this.processor = processor;
         this.rawGroup = rawGroup;
-        this.classLoader = Thread.currentThread().getContextClassLoader();
+        this.classLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class IntegratedEventListenerAdapter implements DynamicConfigListener {
 
         // The classloader at subscription time may not be the same as the classloader at listener configuration
         // time, so need to restore it
-        ClassLoader currentClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader currentClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(classLoader);
             processor.process(rawGroup, event);

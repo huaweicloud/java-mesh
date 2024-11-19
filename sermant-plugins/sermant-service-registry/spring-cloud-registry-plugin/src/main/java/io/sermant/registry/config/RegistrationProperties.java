@@ -17,6 +17,7 @@
 
 package io.sermant.registry.config;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.plugin.service.PluginServiceManager;
@@ -119,7 +120,7 @@ public class RegistrationProperties implements BeanFactoryAware {
 
     private Optional<Object> tryGetInetUtilsByClazz() {
         final Optional<Class<?>> clazz = ClassUtils
-                .loadClass(INET_UTILS_CLASS, Thread.currentThread().getContextClassLoader(), false);
+                .loadClass(INET_UTILS_CLASS, ClassLoaderManager.getContextClassLoaderOrUserClassLoader(), false);
         if (!clazz.isPresent()) {
             return Optional.empty();
         }

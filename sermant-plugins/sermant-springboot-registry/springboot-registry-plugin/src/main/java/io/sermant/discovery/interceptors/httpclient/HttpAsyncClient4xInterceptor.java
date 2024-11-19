@@ -16,6 +16,7 @@
 
 package io.sermant.discovery.interceptors.httpclient;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.plugin.agent.interceptor.Interceptor;
 import io.sermant.core.plugin.service.PluginServiceManager;
@@ -108,7 +109,7 @@ public class HttpAsyncClient4xInterceptor implements Interceptor {
             HttpAsyncUtils.remove();
             return context;
         }
-        final ClassLoader appClassloader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader appClassloader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             if (HttpAsyncUtils.getOrCreateContext().getSelectedInstance() != null) {
                 return context;
@@ -337,7 +338,7 @@ public class HttpAsyncClient4xInterceptor implements Interceptor {
             httpPost.setEntity(oldHttpPost.getEntity());
             return httpPost;
         } else {
-            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
             final Optional<Object> result;
             try {
                 Thread.currentThread().setContextClassLoader(HttpClient.class.getClassLoader());

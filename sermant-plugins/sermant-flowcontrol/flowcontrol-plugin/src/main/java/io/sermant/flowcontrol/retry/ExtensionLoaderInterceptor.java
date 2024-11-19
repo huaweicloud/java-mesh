@@ -17,6 +17,7 @@
 
 package io.sermant.flowcontrol.retry;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.utils.ClassUtils;
 import io.sermant.flowcontrol.retry.cluster.AlibabaDubboCluster;
@@ -70,7 +71,7 @@ public class ExtensionLoaderInterceptor extends InterceptorSupporter {
                 return context;
             }
             final Optional<Class<?>> retryInvokerClass;
-            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
             if (APACHE_DUBBO_CLUSTER_CLASS_NAME.equals(type.getName())) {
                 ClassUtils.defineClass(
                         "io.sermant.flowcontrol.retry.cluster.ApacheDubboClusterInvoker", contextClassLoader);

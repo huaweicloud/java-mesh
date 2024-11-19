@@ -17,6 +17,7 @@
 
 package io.sermant.registry.inject;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.service.inject.ClassInjectDefine;
 import io.sermant.core.utils.ClassUtils;
@@ -47,6 +48,7 @@ public abstract class BaseAutoConfigurationDefine implements ClassInjectDefine {
      * @return Whether it is loaded or not
      */
     protected boolean isClassExistedOnCurrentClassLoader(String className) {
-        return ClassUtils.loadClass(className, Thread.currentThread().getContextClassLoader(), false).isPresent();
+        return ClassUtils.loadClass(className, ClassLoaderManager.getContextClassLoaderOrUserClassLoader(),
+                false).isPresent();
     }
 }

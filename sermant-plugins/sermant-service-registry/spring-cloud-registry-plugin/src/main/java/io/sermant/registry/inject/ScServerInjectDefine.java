@@ -17,6 +17,7 @@
 
 package io.sermant.registry.inject;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.service.inject.ClassInjectDefine;
 import io.sermant.core.utils.ClassUtils;
@@ -41,7 +42,7 @@ public class ScServerInjectDefine implements ClassInjectDefine {
 
     @Override
     public boolean canInject() {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         final RegisterConfig pluginConfig = PluginConfigManager.getPluginConfig(RegisterConfig.class);
         return pluginConfig.isOpenMigration() && pluginConfig.isEnableSpringRegister()
                 && ClassUtils.loadClass("com.netflix.loadbalancer.Server", contextClassLoader).isPresent();

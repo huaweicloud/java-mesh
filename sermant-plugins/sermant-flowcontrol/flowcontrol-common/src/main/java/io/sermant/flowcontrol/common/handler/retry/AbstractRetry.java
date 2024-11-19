@@ -17,6 +17,7 @@
 
 package io.sermant.flowcontrol.common.handler.retry;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.service.xds.entity.XdsRetryPolicy;
@@ -59,7 +60,8 @@ public abstract class AbstractRetry extends ReflectMethodCacheSupport implements
         final List<Class<?>> result = new ArrayList<>(classNames.length);
         for (String className : classNames) {
             try {
-                result.add(Class.forName(className, false, Thread.currentThread().getContextClassLoader()));
+                result.add(Class.forName(className, false,
+                        ClassLoaderManager.getContextClassLoaderOrUserClassLoader()));
             } catch (ClassNotFoundException exception) {
                 LoggerFactory.getLogger().info(String.format(Locale.ENGLISH,
                         "Can not find retry exception class %s", className));

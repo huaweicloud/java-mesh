@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.plugin.service.PluginServiceManager;
@@ -157,7 +158,7 @@ public class ZkDiscoveryClient implements ServiceDiscoveryClient {
             throw new QueryInstanceException("zk state is not valid!");
         }
         checkDiscoveryState();
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ZkDiscoveryClient.class.getClassLoader());
             return convert(serviceDiscovery.queryForInstances(serviceId));

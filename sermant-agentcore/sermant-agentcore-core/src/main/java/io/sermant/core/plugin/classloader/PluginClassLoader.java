@@ -16,6 +16,7 @@
 
 package io.sermant.core.plugin.classloader;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.config.ConfigManager;
 import io.sermant.core.plugin.agent.config.AgentConfig;
@@ -133,9 +134,16 @@ public class PluginClassLoader extends URLClassLoader {
 
     private Class<?> getClassFromLocalClassLoader(String name) {
         ClassLoader loader = localLoader.get(Thread.currentThread().getId());
-
+        if (loader == null) {
+            LOGGER.log(Level.FINE, "localLoader is null, thread name is {0}, classs name is {1}.",
+                    new Object[]{Thread.currentThread().getName(), name});
+        }
         if (loader == null && useContextLoader) {
-            loader = Thread.currentThread().getContextClassLoader();
+            loader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
+            if (loader == null) {
+                LOGGER.log(Level.WARNING, "contextClassLoader is null, thread name is {0}, classs name is {1}.",
+                        new Object[]{Thread.currentThread().getName(), name});
+            }
         }
         Class<?> clazz = null;
 
