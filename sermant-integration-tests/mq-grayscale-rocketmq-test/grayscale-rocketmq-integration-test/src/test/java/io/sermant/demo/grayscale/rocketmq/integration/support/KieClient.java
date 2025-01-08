@@ -47,7 +47,7 @@ public class KieClient {
 
     private final String url;
 
-    private final Map<String, String> labels;
+    private Map<String, String> labels;
 
     /**
      * 构造函数
@@ -65,20 +65,15 @@ public class KieClient {
      * @param url 地址
      */
     public KieClient(RestTemplate restTemplate, String url) {
-        this(restTemplate, url, null);
-    }
-
-    /**
-     * 构造函数
-     *
-     * @param restTemplate 请求器
-     * @param url 地址
-     * @param labels 标签
-     */
-    public KieClient(RestTemplate restTemplate, String url, Map<String, String> labels) {
         this.restTemplate = restTemplate;
         this.url = url == null ? "http://127.0.0.1:30110/v1/default/kie/kv" : url;
-        this.labels = labels;
+        this.labels = new HashMap<>();
+        labels.put("app", "default");
+        labels.put("environment", "development");
+    }
+
+    public void updateServiceNameLabels(String serviceName) {
+        labels.put("service", serviceName);
     }
 
     /**

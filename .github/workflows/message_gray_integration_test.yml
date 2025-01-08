@@ -119,10 +119,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-only-base:
-    name: Test for pull base only for auto rule
+    name: Test base only for auto rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-plugin-false]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_ONLY_BASE']
@@ -140,10 +140,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-exc-only-base:
-    name: Test for pull base only for auto exclude rule
+    name: Test base only for auto exclude rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_EXC_ONLY_BASE']
@@ -161,10 +161,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-base-gray:
-    name: Test for pull base gray for auto rule
+    name: Test pull base gray for auto rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-exc-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_BASE_GRAY_PULL']
@@ -182,10 +182,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-base-gray-lite:
-    name: Test for pull base gray for auto rule
+    name: Test lite pull base gray for auto rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-exc-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_BASE_GRAY_LITE_PULL']
@@ -203,10 +203,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-base-gray-push:
-    name: Test for pull base gray for auto rule
+    name: Test push base gray for auto rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-exc-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_BASE_GRAY_PUSH']
@@ -224,10 +224,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-auto-exc-base-gray:
-    name: Test for pull base gray for auto exclude rule
+    name: Test base gray for auto exclude rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-base-gray]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['AUTO_EXC_BASE_GRAY']
@@ -245,10 +245,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-base-only-base:
-    name: Test for pull base only for base rule
+    name: Test base only for base rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-auto-exc-base-gray]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['BASE_ONLY_BASE']
@@ -266,10 +266,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-base-exc-only-base:
-    name: Test for pull base only for base exclude rule
+    name: Test base only for base exclude rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-base-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['BASE_EXC_ONLY_BASE']
@@ -287,10 +287,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-base-base-gray:
-    name: Test for pull base gray for base rule
+    name: Test base gray for base rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-base-exc-only-base]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['BASE_BASE_GRAY']
@@ -308,10 +308,10 @@ jobs:
       - name: message gray test for test-model=${{ matrix.test-model }} rocketMqClientVersion=${{ matrix.rocketMqClientVersion }}
         uses: ./.github/actions/scenarios/mq-grayscale/rocketmq
   test-for-base-exc-base-gray:
-    name: Test for pull base gray for base exclude rule
+    name: Test base gray for base exclude rule
     runs-on: ubuntu-latest
     if: needs.set-execution-conditions.outputs.enableMqGrayscaleRocketMqAction=='true'
-    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache, test-for-base-base-gray]
+    needs: [set-execution-conditions, build-agent-and-cache, download-midwares-and-cache]
     strategy:
       matrix:
         test-model: ['BASE_EXC_BASE_GRAY']
