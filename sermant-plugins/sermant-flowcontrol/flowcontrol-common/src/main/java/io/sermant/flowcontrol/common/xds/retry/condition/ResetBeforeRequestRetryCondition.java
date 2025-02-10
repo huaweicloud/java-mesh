@@ -26,9 +26,9 @@ import io.sermant.flowcontrol.common.util.XdsThreadLocalUtil;
  * @author zhp
  * @since 2024-11-29
  */
-public class ResetBeforeRequestErrorCondition extends ResetErrorCondition {
+public class ResetBeforeRequestRetryCondition extends ResetRetryCondition {
     @Override
-    public boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result) {
-        return XdsThreadLocalUtil.getSendByteFlag() && super.needRetry(retry, ex, statusCode, result);
+    public boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result) {
+        return XdsThreadLocalUtil.getSendByteFlag() && super.isNeedRetry(retry, ex, statusCode, result);
     }
 }

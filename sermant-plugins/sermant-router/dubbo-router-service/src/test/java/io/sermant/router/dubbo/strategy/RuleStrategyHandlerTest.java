@@ -16,14 +16,24 @@
 
 package io.sermant.router.dubbo.strategy;
 
+import io.sermant.core.config.ConfigManager;
+import io.sermant.core.event.config.EventConfig;
+import io.sermant.core.plugin.config.PluginConfigManager;
+import io.sermant.router.common.cache.DubboCache;
+import io.sermant.router.common.config.RouterConfig;
 import io.sermant.router.common.constants.RouterConstant;
 import io.sermant.router.config.entity.Route;
 import io.sermant.router.config.entity.Rule;
 import io.sermant.router.dubbo.AlibabaInvoker;
 import io.sermant.router.dubbo.ApacheInvoker;
 
+import io.sermant.router.dubbo.handler.TagRouteHandler;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,6 +51,26 @@ public class RuleStrategyHandlerTest {
     private final List<Route> routes;
 
     private final Rule rule;
+
+    private static MockedStatic<PluginConfigManager> mockPluginConfigManager;
+
+    /**
+     * Mock before UT execution
+     */
+    @BeforeClass
+    public static void before() {
+        mockPluginConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        mockPluginConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(Mockito.mock(RouterConfig.class));
+    }
+
+    /**
+     * Release resources after UT execution
+     */
+    @AfterClass
+    public static void after() {
+        mockPluginConfigManager.close();
+    }
 
     /**
      * constructor

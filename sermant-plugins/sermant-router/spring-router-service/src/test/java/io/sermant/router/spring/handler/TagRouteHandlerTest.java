@@ -18,6 +18,8 @@ package io.sermant.router.spring.handler;
 
 import io.sermant.core.config.ConfigManager;
 import io.sermant.core.event.config.EventConfig;
+import io.sermant.core.plugin.config.PluginConfigManager;
+import io.sermant.router.common.config.RouterConfig;
 import io.sermant.router.common.constants.RouterConstant;
 import io.sermant.router.common.request.RequestData;
 import io.sermant.router.config.cache.ConfigCache;
@@ -48,20 +50,23 @@ import java.util.Map;
 public class TagRouteHandlerTest {
     private static TagRouteHandler tagRouteHandler;
 
-    private static EventConfig config;
-
     private static MockedStatic<ConfigManager> mockConfigManager;
+
+    private static MockedStatic<PluginConfigManager> mockPluginConfigManager;
 
     /**
      * Perform mock before the UT is executed
      */
     @BeforeClass
     public static void before() {
-        config = new EventConfig();
+         EventConfig config = new EventConfig();
         config.setEnable(false);
         mockConfigManager = Mockito.mockStatic(ConfigManager.class);
         mockConfigManager.when(() -> ConfigManager.getConfig(EventConfig.class)).thenReturn(config);
         tagRouteHandler = new TagRouteHandler();
+        mockPluginConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        mockPluginConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(Mockito.mock(RouterConfig.class));
     }
 
     /**
@@ -70,6 +75,7 @@ public class TagRouteHandlerTest {
     @AfterClass
     public static void after() {
         mockConfigManager.close();
+        mockPluginConfigManager.close();
     }
 
     /**

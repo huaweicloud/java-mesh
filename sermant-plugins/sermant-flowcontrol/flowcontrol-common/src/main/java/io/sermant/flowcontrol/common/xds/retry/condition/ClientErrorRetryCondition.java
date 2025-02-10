@@ -16,28 +16,28 @@
 
 package io.sermant.flowcontrol.common.xds.retry.condition;
 
-import io.sermant.core.plugin.config.PluginConfigManager;
-import io.sermant.core.utils.CollectionUtils;
-import io.sermant.flowcontrol.common.config.XdsFlowControlConfig;
 import io.sermant.flowcontrol.common.handler.retry.Retry;
 import io.sermant.flowcontrol.common.util.StringUtils;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
 
 /**
- * Retry condition check, determine if the response status code matches the specified status code, and trigger a retry
- * if it does.
+ * Retry condition check, determine if the current error is a client-side error, and trigger a retry if it is a
+ * client-side error
  *
  * @author zhp
  * @since 2024-11-29
  */
-public class SpecificStatusCodeErrorRetryCondition implements RetryCondition {
-    private static final XdsFlowControlConfig CONFIG = PluginConfigManager.getPluginConfig(XdsFlowControlConfig.class);
+public class ClientErrorRetryCondition implements RetryCondition {
+    private static final int MIN_4XX_FAILURE = 400;
+
+    private static final int MAX_4XX_FAILURE = 499;
 
     @Override
-    public boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result) {
-        if (CollectionUtils.isEmpty(CONFIG.getRetryStatusCodes()) || StringUtils.isEmpty(statusCode)) {
+    public boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result) {
+        if (StringUtils.isEmpty(statusCode)) {
             return false;
         }
-        return CONFIG.getRetryStatusCodes().contains(statusCode);
+        int code = Integer.parseInt(statusCode);
+        return code >= MIN_4XX_FAILURE && code <= MAX_4XX_FAILURE;
     }
 }

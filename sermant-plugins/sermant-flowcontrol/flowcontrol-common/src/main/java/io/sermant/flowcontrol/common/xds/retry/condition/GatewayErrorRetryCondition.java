@@ -20,24 +20,22 @@ import io.sermant.flowcontrol.common.handler.retry.Retry;
 import io.sermant.flowcontrol.common.util.StringUtils;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Retry condition check, determine if the current error is a client-side error, and trigger a retry if it is a
- * client-side error
+ * Retry condition check, determine if the current error is a gateway error, and trigger a retry if it is a gateway
+ * error
  *
  * @author zhp
  * @since 2024-11-29
  */
-public class ClientErrorCondition implements RetryCondition {
-    private static final int MIN_4XX_FAILURE = 400;
-
-    private static final int MAX_4XX_FAILURE = 499;
+public class GatewayErrorRetryCondition implements RetryCondition {
+    private static final Set<String> GATE_WAY_FAILURE_CODE = new HashSet<>(Arrays.asList("502", "503", "504"));
 
     @Override
-    public boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result) {
-        if (StringUtils.isEmpty(statusCode)) {
-            return false;
-        }
-        int code = Integer.parseInt(statusCode);
-        return code >= MIN_4XX_FAILURE && code <= MAX_4XX_FAILURE;
+    public boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result) {
+        return !StringUtils.isEmpty(statusCode) && GATE_WAY_FAILURE_CODE.contains(statusCode);
     }
 }

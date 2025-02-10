@@ -59,6 +59,8 @@ public class ExecutorInterceptorTest extends BaseTest {
         // The test has no routing data
         Runnable runnable = () -> {
         };
+        ThreadLocalUtils.removeRequestTag();
+        ThreadLocalUtils.removeRequestData();
         arguments[0] = runnable;
         interceptor.before(context);
         Assert.assertEquals(runnable, context.getArguments()[0]);

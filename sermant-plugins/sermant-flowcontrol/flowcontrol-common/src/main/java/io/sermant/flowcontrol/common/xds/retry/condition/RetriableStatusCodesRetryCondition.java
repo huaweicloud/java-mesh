@@ -16,26 +16,28 @@
 
 package io.sermant.flowcontrol.common.xds.retry.condition;
 
+import io.sermant.core.plugin.config.PluginConfigManager;
+import io.sermant.core.utils.CollectionUtils;
+import io.sermant.flowcontrol.common.config.XdsFlowControlConfig;
 import io.sermant.flowcontrol.common.handler.retry.Retry;
 import io.sermant.flowcontrol.common.util.StringUtils;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Retry condition check, determine if the current error is a gateway error, and trigger a retry if it is a gateway
- * error
+ * Retry condition check, determine if the response status code matches the specified status code, and trigger a retry
+ * if it does.
  *
  * @author zhp
  * @since 2024-11-29
  */
-public class GatewayErrorCondition implements RetryCondition {
-    private static final Set<String> GATE_WAY_FAILURE_CODE = new HashSet<>(Arrays.asList("502", "503", "504"));
+public class RetriableStatusCodesRetryCondition implements RetryCondition {
+    private static final XdsFlowControlConfig CONFIG = PluginConfigManager.getPluginConfig(XdsFlowControlConfig.class);
 
     @Override
-    public boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result) {
-        return !StringUtils.isEmpty(statusCode) && GATE_WAY_FAILURE_CODE.contains(statusCode);
+    public boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result) {
+        if (CollectionUtils.isEmpty(CONFIG.getRetryStatusCodes()) || StringUtils.isEmpty(statusCode)) {
+            return false;
+        }
+        return CONFIG.getRetryStatusCodes().contains(statusCode);
     }
 }

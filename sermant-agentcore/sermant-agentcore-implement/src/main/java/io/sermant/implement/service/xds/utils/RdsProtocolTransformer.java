@@ -270,8 +270,7 @@ public class RdsProtocolTransformer {
             xdsRetryPolicy.setRetryConditions(Arrays.asList(retryPolicy.getRetryOn().split(CommonConstant.COMMA)));
         }
         xdsRetryPolicy.setMaxAttempts(retryPolicy.getNumRetries().getValue());
-        long perTryTimeout = Duration.ofSeconds(retryPolicy.getPerTryTimeout().getSeconds()).toMillis();
-        xdsRetryPolicy.setPerTryTimeout(perTryTimeout);
+        xdsRetryPolicy.setPerTryTimeout(getDurationInMillis(retryPolicy.getPerTryTimeout()));
         return xdsRetryPolicy;
     }
 
@@ -307,8 +306,7 @@ public class RdsProtocolTransformer {
 
     private static XdsDelay parseDelay(FaultDelay faultDelay) {
         XdsDelay xdsDelay = new XdsDelay();
-        long fixedDelay = Duration.ofSeconds(faultDelay.getFixedDelay().getSeconds()).toMillis();
-        xdsDelay.setFixedDelay(fixedDelay);
+        xdsDelay.setFixedDelay(getDurationInMillis(faultDelay.getFixedDelay()));
         io.sermant.core.service.xds.entity.FractionalPercent fractionalPercent =
                 new io.sermant.core.service.xds.entity.FractionalPercent();
         fractionalPercent.setNumerator(faultDelay.getPercentage().getNumerator());
@@ -447,5 +445,9 @@ public class RdsProtocolTransformer {
         xdsTokenBucket.setMaxTokens((int) fieldMap.get(XdsFilterConstant.MAX_TOKENS).getNumberValue());
         xdsTokenBucket.setTokensPerFill((int) tokensPerFill);
         return Optional.of(xdsTokenBucket);
+    }
+
+    private static long getDurationInMillis(com.google.protobuf.Duration duration) {
+        return Duration.ofSeconds(duration.getSeconds()).toMillis() + Duration.ofNanos(duration.getNanos()).toMillis();
     }
 }

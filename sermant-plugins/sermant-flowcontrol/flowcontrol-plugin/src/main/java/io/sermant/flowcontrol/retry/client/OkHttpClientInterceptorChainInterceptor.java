@@ -105,15 +105,15 @@ public class OkHttpClientInterceptorChainInterceptor extends AbstractXdsHttpClie
     }
 
     private Optional<HttpRequestEntity> convertToValidHttpEntity(Request httpRequest) {
-        HttpUrl uri = httpRequest.httpUrl();
-        String serviceName = uri.host().split(CommonConst.ESCAPED_POINT)[0];
+        URL uri = httpRequest.url();
+        String serviceName = uri.getHost().split(CommonConst.ESCAPED_POINT)[0];
         if (!XdsRouterUtils.isXdsRouteRequired(serviceName)) {
             return Optional.empty();
         }
         final Map<String, String> headers = getHeaders(httpRequest);
         return Optional.of(new HttpRequestEntity.Builder()
                 .setRequestType(RequestEntity.RequestType.CLIENT)
-                .setApiPath(uri.encodedPath()).setHeaders(headers)
+                .setApiPath(uri.getPath()).setHeaders(headers)
                 .setMethod(httpRequest.method())
                 .setServiceName(serviceName)
                 .build());

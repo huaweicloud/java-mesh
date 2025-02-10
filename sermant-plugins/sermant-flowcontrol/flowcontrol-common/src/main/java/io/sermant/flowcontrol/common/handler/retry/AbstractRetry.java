@@ -21,6 +21,8 @@ import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.service.xds.entity.XdsRetryPolicy;
 import io.sermant.core.utils.CollectionUtils;
+import io.sermant.core.utils.StringUtils;
+import io.sermant.flowcontrol.common.config.CommonConst;
 import io.sermant.flowcontrol.common.config.FlowControlConfig;
 import io.sermant.flowcontrol.common.support.ReflectMethodCacheSupport;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
@@ -89,15 +91,16 @@ public abstract class AbstractRetry extends ReflectMethodCacheSupport implements
             return false;
         }
         String statusCode = statusCodeOptional.get();
-        if (conditions.contains(statusCode)) {
-            return true;
+        if (isSuccess(statusCode)) {
+            return false;
         }
         for (String conditionName : conditions) {
-            Optional<RetryCondition> retryConditionOptional = RetryConditionType.getRetryConditionByName(conditionName);
+            Optional<RetryCondition> retryConditionOptional = RetryConditionType
+                    .getRetryConditionWithResultByName(conditionName);
             if (!retryConditionOptional.isPresent()) {
                 continue;
             }
-            if (retryConditionOptional.get().needRetry(this, null, statusCode, result)) {
+            if (retryConditionOptional.get().isNeedRetry(this, null, statusCode, result)) {
                 return true;
             }
         }
@@ -110,15 +113,30 @@ public abstract class AbstractRetry extends ReflectMethodCacheSupport implements
             return false;
         }
         for (String conditionName : retryPolicy.getRetryConditions()) {
-            Optional<RetryCondition> retryConditionOptional = RetryConditionType.getRetryConditionByName(conditionName);
+            Optional<RetryCondition> retryConditionOptional = RetryConditionType
+                    .getRetryConditionWithExceptionByName(conditionName);
             if (!retryConditionOptional.isPresent()) {
                 continue;
             }
-            if (retryConditionOptional.get().needRetry(this, ex, null, null)) {
+            if (retryConditionOptional.get().isNeedRetry(this, ex, null, null)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Determine if the request is successful
+     *
+     * @param statusCode status code
+     * @return if the request is successful,true : success false: failure
+     */
+    public static boolean isSuccess(String statusCode) {
+        if (StringUtils.isEmpty(statusCode)) {
+            return false;
+        }
+        int code = Integer.parseInt(statusCode);
+        return code >= CommonConst.MIN_SUCCESS_STATUS_CODE && code <= CommonConst.MAX_SUCCESS_STATUS_CODE;
     }
 
     /**
