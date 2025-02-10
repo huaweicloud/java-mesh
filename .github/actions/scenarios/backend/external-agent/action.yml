@@ -1,0 +1,235 @@
+name: "Test external agent management"
+description: "Auto test for external agent"
+runs:
+  using: "composite"
+  steps:
+    - name: entry
+      uses: ./.github/actions/common/entry
+      with:
+        log-dir: ./logs/backend-external-agent
+    - name: compile AgentLoader
+      shell: bash
+      run: |
+        cp sermant-integration-tests/scripts/AgentLoader.java ./
+        javac -classpath ./:${{ env.JAVA_HOME}}/lib/tools.jar AgentLoader.java
+    - name: download opentelemetry agent
+      uses: actions/cache@v4
+      with:
+        path: opentelemetry-javaagent.jar
+        key: ${{ runner.os }}-opentelemetry-javaagent.jar
+        restore-keys: |
+          ${{ runner.os }}-opentelemetry-javaagent.jar
+    - name: start backend with zookeeper
+      shell: bash
+      env:
+        DYNAMIC_CONFIG_SERVERADDRESS: 127.0.0.1:2181
+        DYNAMIC_CONFIG_DYNAMICCONFIGTYPE: ZOOKEEPER
+        DYNAMIC_CONFIG_ENABLE: true
+        NETTY_PORT: 6894
+        SERVER_PORT: 8910
+        MAX_EFFECTIVE_TIME: 20000
+      run: |
+        nohup java -jar sermant-agent-${{ env.sermantVersion }}/server/sermant/sermant-backend-${{ env.sermantVersion }}.jar &
+        sleep 20
+
+    - name: start application with sermant agent without external agent
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        -Dserver.port=8915 \
+        -Dagent.config.externalAgent.injection=false \
+        -Dagent.service.heartbeat.enable=true \
+        -Dagent.service.gateway.enable=true \
+        -Devent.enable=true \
+        -Dgateway.nettyPort=6894 \
+        -Dheartbeat.interval=5000 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8915/ping 120
+    - name: test start with sermant agent without external agent
+      shell: bash
+      run: |
+        export TEST_MODE=startWithoutExternalAgent
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8915 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: start application with sermant agent and external agent
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        -Dserver.port=8916 \
+        -Dagent.config.externalAgent.injection=true \
+        -Dagent.config.externalAgent.name=OTEL \
+        -Dagent.config.externalAgent.file=opentelemetry-javaagent.jar \
+        -Dagent.service.heartbeat.enable=true \
+        -Dagent.service.gateway.enable=true \
+        -Devent.enable=true \
+        -Dgateway.nettyPort=6894 \
+        -Dheartbeat.interval=5000 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8916/ping 120
+    - name: test start with sermant agent and external agent
+      shell: bash
+      run: |
+        export TEST_MODE=startWithExternalAgent
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8916 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: start application alone
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -Dserver.port=8917 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8917/ping 120
+        sleep 10
+    - name: dynamic install external agent
+      shell: bash
+      run: java -classpath ./:${{ env.JAVA_HOME}}/lib/tools.jar AgentLoader sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        command=INSTALL-EXTERNAL-AGENT:OTEL,AGENT_FILE=opentelemetry-javaagent.jar,agent.service.heartbeat.enable=true,agent.service.gateway.enable=true,event.enable=true,gateway.nettyPort=6894,heartbeat.interval=5000
+    - name: test install external agent by attach in case of sermant agent is not installed
+      shell: bash
+      run: |
+        export TEST_MODE=installByAttach
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8917 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: start application with sermant agent without external agent
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        -Dserver.port=8918 \
+        -Dagent.config.externalAgent.injection=false \
+        -Dagent.service.heartbeat.enable=true \
+        -Dagent.service.gateway.enable=true \
+        -Devent.enable=true \
+        -Dgateway.nettyPort=6894 \
+        -Dheartbeat.interval=5000 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8918/ping 120
+    - name: dynamic install external agent
+      shell: bash
+      run: java -classpath ./:${{ env.JAVA_HOME}}/lib/tools.jar AgentLoader sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        command=INSTALL-EXTERNAL-AGENT:OTEL,AGENT_FILE=opentelemetry-javaagent.jar,agent.service.heartbeat.enable=true,agent.service.gateway.enable=true,event.enable=true,gateway.nettyPort=6894
+    - name: test install external agent by attach in case of sermant agent is installed
+      shell: bash
+      run: |
+        export TEST_MODE=installByAttach
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8918 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: start application alone
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -Dserver.port=8919 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8919/ping 120
+        sleep 10
+    - name: dynamic install external agent
+      shell: bash
+      run: java -classpath ./:${{ env.JAVA_HOME}}/lib/tools.jar AgentLoader sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        agent.config.externalAgent.injection=true,agent.config.externalAgent.name=OTEL,agent.config.externalAgent.file=opentelemetry-javaagent.jar,agent.service.heartbeat.enable=true,agent.service.gateway.enable=true,event.enable=true,gateway.nettyPort=6894,heartbeat.interval=5000
+    - name: test install external agent by attach in case of sermant agent is not installalled and has set external agent config
+      shell: bash
+      run: |
+        export TEST_MODE=installByAttach
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8919 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: start application with sermant agent without external agent
+      shell: bash
+      env:
+        dynamic.config.serverAddress: 127.0.0.1:2181
+        dynamic.config.dynamicConfigType: ZOOKEEPER
+        service.meta.project: TestAgentCore
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar \
+        -Dserver.port=8920 \
+        -Dagent.config.externalAgent.injection=false \
+        -Dagent.service.heartbeat.enable=true \
+        -Dagent.service.gateway.enable=true \
+        -Devent.enable=true \
+        -Dgateway.nettyPort=6894 \
+        -Dheartbeat.interval=5000 \
+        -jar sermant-agent-${{ env.sermantVersion }}/agent/agentcore-test-application-1.0.0-jar-with-dependencies.jar > ${{ env.logDir }}/agentcore-test.log 2>&1 &
+    - name: waiting for application start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8920/ping 120
+    - name: test install external agent by Sermant Backend
+      shell: bash
+      run: |
+        export TEST_MODE=install
+        python -m unittest ./sermant-integration-tests/scripts/test_backend_external_agent.py
+    - name: stop application
+      shell: bash
+      run: |
+        netstat -nlp | grep :8920 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+        sleep 3
+    - name: stop backend
+      shell: bash
+      run: |
+        netstat -nlp | grep :8910 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
+    - name: exit
+      if: always()
+      uses: ./.github/actions/common/exit
+      with:
+        processor-keyword: agentcore|backend
+    - name: if failure then upload error log
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() || cancelled() }}
+      with:
+        name: (${{ github.job }})-backend-logs
+        path: |
+          ./*.log
+          ./logs/**
+        if-no-files-found: warn
+        retention-days: 2

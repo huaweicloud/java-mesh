@@ -3,18 +3,13 @@ description: "Auto test for Backend"
 runs:
   using: "composite"
   steps:
-    - name: download agent
-      uses: actions/cache@v4
-      with:
-        path: sermant-agent-*/
-        key: ${{ runner.os }}-agent-${{ github.run_id }}
     - name: package dubbo 2.6.0 tests
       shell: bash
       run: mvn package -Dalibaba.dubbo.version=2.6.0 -DskipTests -P260 --file sermant-integration-tests/dubbo-test/pom.xml
     - name: entry
       uses: ./.github/actions/common/entry
       with:
-        log-dir: ./logs/backend
+        log-dir: ./logs/backend-memory
     - name: start backend with memory
       shell: bash
       run: |
@@ -39,10 +34,6 @@ runs:
       shell: bash
       run: |
         netstat -nlp | grep :28021 | awk '{print $7}' | awk -F "/" '{print $1}' | xargs kill
-    - name: install requests
-      shell: bash
-      run: |
-        pip install requests
     - name: start test
       shell: bash
       run: |

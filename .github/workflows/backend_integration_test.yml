@@ -57,6 +57,17 @@ jobs:
         run: |
           export ROOT_PATH=$(pwd)
           bash ./sermant-integration-tests/scripts/tryDownloadMidware.sh nacos210
+      - name: cache opentelemetry agent
+        uses: actions/cache@v4
+        with:
+          path: opentelemetry-javaagent.jar
+          key: ${{ runner.os }}-opentelemetry-javaagent.jar
+          restore-keys: |
+            ${{ runner.os }}-opentelemetry-javaagent.jar
+      - name: download opentelemetry agent
+        run: |
+          export ROOT_PATH=$(pwd)
+          bash ./sermant-integration-tests/scripts/tryDownloadMidware.sh otel
   build-agent-and-cache:
     name: build agent and cache
     runs-on: ubuntu-latest
@@ -102,3 +113,5 @@ jobs:
         uses: ./.github/actions/scenarios/backend/config
       - name: start hot plugging test
         uses: ./.github/actions/scenarios/backend/hot-plugging
+      - name: start external agent test
+        uses: ./.github/actions/scenarios/backend/external-agent

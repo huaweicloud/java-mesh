@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2023 Huawei Technologies Co., Ltd. All rights reserved.
+ * Copyright (C) 2023-2025 Huawei Technologies Co., Ltd. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,14 @@ public class AgentCoreTestApplication {
      * @throws IllegalAccessException
      */
     public static void main(String[] args) throws IOException, IllegalAccessException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(SERVER_PORT), 0);
+        int actualPort;
+        String port = System.getProperty("server.port");
+        if (port != null && !"".equals(port)) {
+            actualPort = Integer.parseInt(port);
+        } else {
+            actualPort = SERVER_PORT;
+        }
+        HttpServer server = HttpServer.create(new InetSocketAddress(actualPort), 0);
 
         // 添加URL路由
         for (Field field : RouterPath.class.getDeclaredFields()) {

@@ -3,6 +3,10 @@ description: "Auto test for Backend"
 runs:
   using: "composite"
   steps:
+    - name: entry
+      uses: ./.github/actions/common/entry
+      with:
+        log-dir: ./logs/backend-config
     - name: start backend with zookeeper
       shell: bash
       env:

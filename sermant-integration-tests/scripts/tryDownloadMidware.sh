@@ -44,6 +44,9 @@ ROCKETMQ_514_FILE_NAME=rocketmq-all-5.1.4-bin-release.zip
 KAFKA_ADDRESS=https://archive.apache.org/dist/kafka/2.7.0/kafka_2.13-2.7.0.tgz
 KAFKA_FILE_NAME=kafka_2.13-2.7.0.tgz
 
+OTEL_ADDRESS=https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v2.10.0/opentelemetry-javaagent.jar
+OTEL_FILE_NAME=opentelemetry-javaagent.jar
+
 #重试次数
 TRY_TIMES=3
 
@@ -95,6 +98,9 @@ elif [ $midleware == "rocketmq514" ]; then
 elif [ $midleware == "kafka" ]; then
   ADDRESS=$KAFKA_ADDRESS
   FILE_NAME=$KAFKA_FILE_NAME
+  elif [ $midleware == "otel" ]; then
+    ADDRESS=$OTEL_ADDRESS
+    FILE_NAME=$OTEL_FILE_NAME
 else
   ADDRESS=$CSE_ADDRESS
   FILE_NAME=$CSE_FILE_NAME

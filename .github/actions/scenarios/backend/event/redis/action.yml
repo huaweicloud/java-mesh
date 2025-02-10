@@ -6,7 +6,7 @@ runs:
     - name: entry
       uses: ./.github/actions/common/entry
       with:
-        log-dir: ./logs/backend
+        log-dir: ./logs/backend-redis
     - name: install redis
       shell: bash
       run: |

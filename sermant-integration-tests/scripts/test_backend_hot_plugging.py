@@ -74,6 +74,5 @@ class TestConfig(unittest.TestCase):
             resp = session.get(self.query_uninstall_result_url).json()
             self.assertTrue(resp.get('DYNAMIC_UNINSTALL_PLUGIN_INTERCEPTOR_FAILURE'))
             self.assertFalse(resp.get('DYNAMIC_UNINSTALL_REPEAT_ENHANCE'))
-
 if __name__ == "__main__":
     unittest.main()
