@@ -18,6 +18,8 @@ package io.sermant.flowcontrol.common.xds.retry.condition;
 
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.utils.CollectionUtils;
+import io.sermant.core.utils.StringUtils;
+import io.sermant.flowcontrol.common.config.CommonConst;
 import io.sermant.flowcontrol.common.config.XdsFlowControlConfig;
 import io.sermant.flowcontrol.common.handler.retry.Retry;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
@@ -32,12 +34,16 @@ import java.util.Set;
  * @author zhp
  * @since 2024-11-29
  */
-public class SpecificHeaderNameErrorRetryCondition implements RetryCondition {
+public class RetriableHeadersRetryCondition implements RetryCondition {
     private static final XdsFlowControlConfig CONFIG = PluginConfigManager.getPluginConfig(XdsFlowControlConfig.class);
 
     @Override
-    public boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result) {
+    public boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result) {
         if (CollectionUtils.isEmpty(CONFIG.getRetryHeaderNames())) {
+            return false;
+        }
+        int code = StringUtils.isEmpty(statusCode) ? CommonConst.DEFAULT_RESPONSE_CODE : Integer.parseInt(statusCode);
+        if (code >= CommonConst.MIN_SUCCESS_STATUS_CODE && code <= CommonConst.MAX_SUCCESS_STATUS_CODE) {
             return false;
         }
         Optional<Set<String>> headerNames = retry.getHeaderNames(result);

@@ -299,6 +299,31 @@ public class CommonConst {
      */
     public static final String DEFAULT_CONTENT_TYPE = "text/plain";
 
+    /**
+     * Minimum response code for a successful request
+     */
+    public static final int MIN_SUCCESS_STATUS_CODE = 200;
+
+    /**
+     * Maximum response code for a successful request
+     */
+    public static final int MAX_SUCCESS_STATUS_CODE = 399;
+
+    /**
+     * Retry condition based on the result
+     */
+    public static final int RETRY_CONDITION_BY_RESULT = 0;
+
+    /**
+     * Retry condition based on the exception
+     */
+    public static final int RETRY_CONDITION_BY_EXCEPTION = 1;
+
+    /**
+     * Retry condition based on both the status code and the exception
+     */
+    public static final int RETRY_CONDITION_BY_STATUS_AND_EXCEPTION = 2;
+
     private CommonConst() {
     }
 }

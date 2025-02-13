@@ -16,13 +16,19 @@
 
 package io.sermant.router.spring.strategy;
 
+import io.sermant.core.plugin.config.PluginConfigManager;
+import io.sermant.router.common.config.RouterConfig;
 import io.sermant.router.common.constants.RouterConstant;
 import io.sermant.router.config.entity.Route;
 import io.sermant.router.config.entity.Rule;
 import io.sermant.router.spring.TestDefaultServiceInstance;
 
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.cloud.client.ServiceInstance;
 
 import java.util.ArrayList;
@@ -38,9 +44,29 @@ import java.util.Map;
  * @since 2022-09-09
  */
 public class RuleStrategyHandlerTest {
+    private static MockedStatic<PluginConfigManager> mockPluginConfigManager;
+
     private final List<Route> routes;
 
     private final Rule rule;
+
+    /**
+     * Perform mock before the UT is executed
+     */
+    @BeforeClass
+    public static void before() {
+        mockPluginConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        mockPluginConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(Mockito.mock(RouterConfig.class));
+    }
+
+    /**
+     * Resources are released after UT is executed
+     */
+    @AfterClass
+    public static void after() {
+        mockPluginConfigManager.close();
+    }
 
     /**
      * Constructor

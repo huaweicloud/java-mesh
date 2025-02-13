@@ -18,7 +18,9 @@ package io.sermant.router.dubbo.handler;
 
 import io.sermant.core.config.ConfigManager;
 import io.sermant.core.event.config.EventConfig;
+import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.router.common.cache.DubboCache;
+import io.sermant.router.common.config.RouterConfig;
 import io.sermant.router.common.constants.RouterConstant;
 import io.sermant.router.config.cache.ConfigCache;
 import io.sermant.router.dubbo.ApacheInvoker;
@@ -26,8 +28,10 @@ import io.sermant.router.dubbo.RuleInitializationUtils;
 import io.sermant.router.dubbo.service.AbstractDirectoryServiceTest.ApacheInvocation;
 
 import org.apache.dubbo.rpc.Invocation;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.MockedStatic;
@@ -52,6 +56,8 @@ public class TagRouteHandlerTest {
 
     private static MockedStatic<ConfigManager> mockConfigManager;
 
+    private static MockedStatic<PluginConfigManager> mockPluginConfigManager;
+
     /**
      * Mock before UT execution
      */
@@ -62,6 +68,9 @@ public class TagRouteHandlerTest {
         mockConfigManager = Mockito.mockStatic(ConfigManager.class);
         mockConfigManager.when(() -> ConfigManager.getConfig(EventConfig.class)).thenReturn(config);
         tagRouteHandler = new TagRouteHandler();
+        mockPluginConfigManager = Mockito.mockStatic(PluginConfigManager.class);
+        mockPluginConfigManager.when(() -> PluginConfigManager.getPluginConfig(RouterConfig.class))
+                .thenReturn(Mockito.mock(RouterConfig.class));
     }
 
     /**
@@ -71,6 +80,7 @@ public class TagRouteHandlerTest {
     public static void after() {
         mockConfigManager.close();
         DubboCache.INSTANCE.clear();
+        mockPluginConfigManager.close();
     }
 
     /**

@@ -34,5 +34,5 @@ public interface RetryCondition {
      * @param statusCode response status code
      * @return The result of the decision
      */
-    boolean needRetry(Retry retry, Throwable ex, String statusCode, Object result);
+    boolean isNeedRetry(Retry retry, Throwable ex, String statusCode, Object result);
 }

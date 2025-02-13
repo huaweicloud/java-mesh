@@ -28,6 +28,7 @@ import io.sermant.core.service.xds.entity.XdsServiceCluster;
 import io.sermant.core.utils.CollectionUtils;
 import io.sermant.core.utils.StringUtils;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,16 +140,17 @@ public class CdsProtocolTransformer {
         xdsInstanceCircuitBreakers.setConsecutiveGatewayFailure(outlierDetection.getConsecutiveGatewayFailure()
                 .getValue());
         xdsInstanceCircuitBreakers.setConsecutive5xxFailure(outlierDetection.getConsecutive5Xx().getValue());
-        long interval = java.time.Duration.ofSeconds(outlierDetection.getInterval().getSeconds()).toMillis();
-        xdsInstanceCircuitBreakers.setInterval(interval);
-        long ejectionTime = java.time.Duration.ofSeconds(outlierDetection.getBaseEjectionTime().getSeconds())
-                .toMillis();
-        xdsInstanceCircuitBreakers.setBaseEjectionTime(ejectionTime);
+        xdsInstanceCircuitBreakers.setInterval(getDurationInMillis(outlierDetection.getInterval()));
+        xdsInstanceCircuitBreakers.setBaseEjectionTime(getDurationInMillis(outlierDetection.getBaseEjectionTime()));
         xdsInstanceCircuitBreakers.setMaxEjectionPercent(outlierDetection.getMaxEjectionPercent().getValue());
         xdsInstanceCircuitBreakers.setFailurePercentageMinimumHosts(outlierDetection.getFailurePercentageMinimumHosts()
                 .getValue());
         xdsInstanceCircuitBreakers.setMinHealthPercent(cluster.getCommonLbConfig().
                 getHealthyPanicThreshold().getValue());
         return xdsInstanceCircuitBreakers;
+    }
+
+    private static long getDurationInMillis(com.google.protobuf.Duration duration) {
+        return Duration.ofSeconds(duration.getSeconds()).toMillis() + Duration.ofNanos(duration.getNanos()).toMillis();
     }
 }

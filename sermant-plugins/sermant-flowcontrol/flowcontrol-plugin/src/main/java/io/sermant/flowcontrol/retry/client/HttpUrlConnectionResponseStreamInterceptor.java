@@ -121,6 +121,8 @@ public class HttpUrlConnectionResponseStreamInterceptor extends AbstractXdsHttpC
         HttpURLConnection connection = (HttpURLConnection) obj;
         ReflectUtils.setFieldValue(connection,"inputStream", null);
         ReflectUtils.setFieldValue(connection,"cachedInputStream", null);
+        ReflectUtils.setFieldValue(connection, "cachedHeaders", null);
+        ReflectUtils.setFieldValue(connection, "filteredHeaders", null);
         Optional<ServiceInstance> serviceInstanceOptional = chooseServiceInstanceForXds();
         if (!serviceInstanceOptional.isPresent()) {
             return;
@@ -208,6 +210,11 @@ public class HttpUrlConnectionResponseStreamInterceptor extends AbstractXdsHttpC
         }
 
         @Override
+        public boolean isNeedRetry(Object result, XdsRetryPolicy retryPolicy) {
+            return this.isNeedRetry((Throwable) null, retryPolicy);
+        }
+
+        @Override
         public boolean isNeedRetry(Throwable throwable, XdsRetryPolicy retryPolicy) {
             List<String> conditions = retryPolicy.getRetryConditions();
             if (CollectionUtils.isEmpty(conditions)) {
@@ -215,22 +222,20 @@ public class HttpUrlConnectionResponseStreamInterceptor extends AbstractXdsHttpC
             }
             Optional<String> statusCodeOptional = this.getCode(null);
             String statusCode = statusCodeOptional.orElse(StringUtils.EMPTY);
+            if (isSuccess(statusCode)) {
+                return false;
+            }
             for (String conditionName : conditions) {
-                Optional<RetryCondition> retryConditionOptional = RetryConditionType.
-                        getRetryConditionByName(conditionName);
+                Optional<RetryCondition> retryConditionOptional =
+                        RetryConditionType.getRetryConditionByName(conditionName);
                 if (!retryConditionOptional.isPresent()) {
                     continue;
                 }
-                if (retryConditionOptional.get().needRetry(this, throwable, statusCode, null)) {
+                if (retryConditionOptional.get().isNeedRetry(this, throwable, statusCode, null)) {
                     return true;
                 }
             }
             return false;
-        }
-
-        @Override
-        public boolean isNeedRetry(Object result, XdsRetryPolicy retryPolicy) {
-            return this.isNeedRetry((Throwable) null, retryPolicy);
         }
 
         @Override

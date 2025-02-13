@@ -16,14 +16,14 @@
 
 package io.sermant.flowcontrol.common.xds.retry;
 
-import io.sermant.flowcontrol.common.xds.retry.condition.ClientErrorCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.ConnectErrorRetryCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.GatewayErrorCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.ResetBeforeRequestErrorCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.ResetErrorCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.ServerErrorCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.SpecificHeaderNameErrorRetryCondition;
-import io.sermant.flowcontrol.common.xds.retry.condition.SpecificStatusCodeErrorRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.ResetBeforeRequestRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.ClientErrorRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.ConnectFailureRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.GatewayErrorRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.ResetRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.ServerErrorRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.RetriableHeadersRetryCondition;
+import io.sermant.flowcontrol.common.xds.retry.condition.RetriableStatusCodesRetryCondition;
 import org.junit.Test;
 
 import java.util.Optional;
@@ -41,27 +41,27 @@ public class RetryConditionManagerTest {
     public void testRetryCondition() {
         Optional<RetryCondition> result = RetryConditionType.getRetryConditionByName(
                 RetryConditionType.SERVER_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof ServerErrorCondition);
+        assertTrue(result.isPresent() && result.get() instanceof ServerErrorRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
                 RetryConditionType.CLIENT_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof ClientErrorCondition);
+        assertTrue(result.isPresent() && result.get() instanceof ClientErrorRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
-                RetryConditionType.CONNECT_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof ConnectErrorRetryCondition);
+                RetryConditionType.CONNECT_FAILURE.getConditionName());
+        assertTrue(result.isPresent() && result.get() instanceof ConnectFailureRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
-                RetryConditionType.RESET_BEFORE_REQUEST_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof ResetBeforeRequestErrorCondition);
+                RetryConditionType.RESET_BEFORE_REQUEST.getConditionName());
+        assertTrue(result.isPresent() && result.get() instanceof ResetBeforeRequestRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
                 RetryConditionType.GATEWAY_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof GatewayErrorCondition);
+        assertTrue(result.isPresent() && result.get() instanceof GatewayErrorRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
-                RetryConditionType.RESET_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof ResetErrorCondition);
+                RetryConditionType.RESET.getConditionName());
+        assertTrue(result.isPresent() && result.get() instanceof ResetRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
-                RetryConditionType.SPECIFIC_HEADER_NAME_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof SpecificHeaderNameErrorRetryCondition);
+                RetryConditionType.RETRIABLE_HEADERS.getConditionName());
+        assertTrue(result.isPresent() && result.get() instanceof RetriableHeadersRetryCondition);
         result = RetryConditionType.getRetryConditionByName(
-                RetryConditionType.SPECIFIC_STATUS_CODE_ERROR.getConditionName());
-        assertTrue(result.isPresent() && result.get() instanceof SpecificStatusCodeErrorRetryCondition);
+                RetryConditionType.RETRIABLE_STATUS_CODES.getConditionName());
+        assertTrue(result.isPresent() && result.get() instanceof RetriableStatusCodesRetryCondition);
     }
 }
