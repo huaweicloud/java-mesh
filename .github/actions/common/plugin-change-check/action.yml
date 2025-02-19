@@ -530,6 +530,14 @@ runs:
       id: changed-dubbo-common-action
       with:
         paths: ./.github/actions/scenarios/dubbo/dubbo-common ./.github/actions/common/dubbo ./.github/workflows/dubbo_integration_test.yml
+    - uses: ktamas77/has-changed-path@v1.0.3
+      id: changed-dubbo3-flow-action
+      with:
+        paths: ./.github/actions/scenarios/dubbo/flow-dubbo3 ./.github/actions/common/dubbo ./.github/workflows/dubbo_integration_test.yml
+    - name: env dubbo3-flow-action
+      shell: bash
+      run: |
+        echo "enableDubbo3FlowActionChange=${{ steps.changed-dubbo3-flow-action.outputs.changed }}" >> $GITHUB_ENV
     - name: env dubbo-router-action
       shell: bash
       run: |
@@ -677,6 +685,13 @@ runs:
             ${{ env.enableDubboTestChange }} == 'true' ];then
           echo "enableDubboLane=true" >> $GITHUB_ENV
           echo "enableDubbo3Lane=true" >> $GITHUB_ENV
+        fi
+        # ==========dubbo3 flow is needed to test?==========
+        if [ ${{ env.sermantAgentCoreChanged }} == 'true' -o ${{ env.sermantFlowcontrolChanged }} == 'true' -o \
+            ${{ env.enableDubbo3FlowActionChange }} == 'true' -o \
+            ${{ steps.changed-common-action.outputs.changed }} == 'true' -o ${{ env.triggerPushEvent }} == 'true' -o \
+            ${{ env.enableDubboTestChange }} == 'true' ];then
+          echo "enableDubbo3Flow=true" >> $GITHUB_ENV
         fi
 
         # *****************spring_integration_test_1.yml*****************

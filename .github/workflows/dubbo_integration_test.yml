@@ -48,6 +48,7 @@ jobs:
           echo "enableDubboRemoval=${{env.enableDubboRemoval}}" >> $GITHUB_OUTPUT
           echo "enableDubbo3Router=${{env.enableDubbo3Router}}" >> $GITHUB_OUTPUT
           echo "enableDubbo3Lane=${{env.enableDubbo3Lane}}" >> $GITHUB_OUTPUT
+          echo "enableDubbo3Flow=${{env.enableDubbo3Flow}}" >> $GITHUB_OUTPUT
     outputs:
       enableDubboRouter: ${{ steps.set-outputs.outputs.enableDubboRouter }}
       enableDubboMonitor: ${{ steps.set-outputs.outputs.enableDubboMonitor }}
@@ -57,6 +58,7 @@ jobs:
       enableDubboRemoval: ${{ steps.set-outputs.outputs.enableDubboRemoval }}
       enableDubbo3Router: ${{ steps.set-outputs.outputs.enableDubbo3Router }}
       enableDubbo3Lane: ${{ steps.set-outputs.outputs.enableDubbo3Lane }}
+      enableDubbo3Flow: ${{ steps.set-outputs.outputs.enableDubbo3Flow }}
   download-midwares-and-cache:
     name: download and cache middlewares
     runs-on: ubuntu-latest
@@ -152,7 +154,7 @@ jobs:
         uses: ./.github/actions/scenarios/dubbo/removal
   test-for-dubbo3:
     name: Test for dubbo3.x
-    if: needs.set-execution-conditions.outputs.enableDubbo3Router == 'true' || needs.set-execution-conditions.outputs.enableDubbo3Lane == 'true'
+    if: needs.set-execution-conditions.outputs.enableDubbo3Router == 'true' || needs.set-execution-conditions.outputs.enableDubbo3Lane == 'true' || needs.set-execution-conditions.outputs.enableDubbo3Flow == 'true'
     runs-on: ubuntu-latest
     needs: [set-execution-conditions, download-midwares-and-cache, build-agent-and-cache ]
     strategy:
@@ -241,3 +243,6 @@ jobs:
       - name: (dubbo3.x lane) test for ${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }}
         if: needs.set-execution-conditions.outputs.enableDubbo3Lane == 'true'
         uses: ./.github/actions/scenarios/dubbo/lane-dubbo3
+      - name: (dubbo3.x flow) test for ${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }}
+        if: needs.set-execution-conditions.outputs.enableDubbo3Flow == 'true'
+        uses: ./.github/actions/scenarios/dubbo/dubbo3-flow

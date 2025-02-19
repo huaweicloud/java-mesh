@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -55,7 +57,9 @@ public class FlowHeaderController {
         try {
             RpcContext.getContext().setAttachment(key, value);
             RpcContext.getContext().setAttachment(key2, value2);
-            return flowControlService.rateLimitingWithHeader(Collections.singletonMap(key, value));
+            Map<String, Object> attachments = new HashMap<>();
+            attachments.put(key, value);
+            return flowControlService.rateLimitingWithHeader(attachments);
         } finally {
             RpcContext.getContext().remove(key);
             RpcContext.getContext().remove(key2);
