@@ -16,6 +16,7 @@ runs:
         dynamic.config.dynamicConfigType: KIE
         dynamic.config.serverAddress: 127.0.0.1:30110
         SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_SERVICE: ${{ matrix.test-model }}
       run: |
         nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=grayscale-rocketmq-producer -jar \
         sermant-integration-tests/mq-grayscale-rocketmq-test/grayscale-rocketmq-producer-demo/target/grayscale-rocketmq-producer-demo.jar > ${{ env.logDir }}/${{ matrix.rocketMqClientVersion }}-rocketmq-producer-base.log 2>&1 &
@@ -26,6 +27,7 @@ runs:
         dynamic.config.serverAddress: 127.0.0.1:30110
         SERVICE_META_ENVIRONMENT: development
         SERVICE_META_VERSION: 1.0.1
+        SERVICE_META_SERVICE: ${{ matrix.test-model }}
       run: |
         nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=grayscale-rocketmq-producer -Dserver.port=9040 -jar \
         sermant-integration-tests/mq-grayscale-rocketmq-test/grayscale-rocketmq-producer-demo/target/grayscale-rocketmq-producer-demo.jar > ${{ env.logDir }}/${{ matrix.rocketMqClientVersion }}-rocketmq-producer-gray.log 2>&1 &
@@ -35,6 +37,7 @@ runs:
         dynamic.config.dynamicConfigType: KIE
         dynamic.config.serverAddress: 127.0.0.1:30110
         SERVICE_META_ENVIRONMENT: development
+        SERVICE_META_SERVICE: ${{ matrix.test-model }}
       run: |
         nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=grayscale-rocketmq-consumer -jar \
         sermant-integration-tests/mq-grayscale-rocketmq-test/grayscale-rocketmq-consumer-demo/target/grayscale-rocketmq-consumer-demo.jar > ${{ env.logDir }}/${{ matrix.rocketMqClientVersion }}-rocketmq-consumer-base.log 2>&1 &
@@ -46,6 +49,7 @@ runs:
         dynamic.config.serverAddress: 127.0.0.1:30110
         SERVICE_META_ENVIRONMENT: development
         SERVICE_META_VERSION: 1.0.1
+        SERVICE_META_SERVICE: ${{ matrix.test-model }}
       run: |
         nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=grayscale-rocketmq-consumer -Dserver.port=9010 -jar \
         sermant-integration-tests/mq-grayscale-rocketmq-test/grayscale-rocketmq-consumer-demo/target/grayscale-rocketmq-consumer-demo.jar > ${{ env.logDir }}/${{ matrix.rocketMqClientVersion }}-rocketmq-consumer-gray.log 2>&1 &

@@ -59,7 +59,7 @@ public class GrayscaleRocketmqTest {
 
     private void testPluginEnabledFalsePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -69,7 +69,7 @@ public class GrayscaleRocketmqTest {
 
     private void testPluginEnabledFalseLitePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -79,7 +79,7 @@ public class GrayscaleRocketmqTest {
 
     private void testPluginEnabledFalsePush() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -100,15 +100,15 @@ public class GrayscaleRocketmqTest {
     public void testAutoOnlyBaseConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("AUTO", "");
         testAutoOnlyBasePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoOnlyBaseLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoOnlyBasePush();
     }
 
     private void testAutoOnlyBasePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -118,7 +118,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoOnlyBaseLitePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -128,7 +128,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoOnlyBasePush() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -141,15 +141,15 @@ public class GrayscaleRocketmqTest {
     public void testAutoExcOnlyBaseConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("AUTO", "gray");
         testAutoExcOnlyBasePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoExcOnlyBaseLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoExcOnlyBasePush();
     }
 
     private void testAutoExcOnlyBasePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -159,7 +159,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoExcOnlyBaseLitePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -169,7 +169,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoExcOnlyBasePush() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -182,9 +182,9 @@ public class GrayscaleRocketmqTest {
     public void testAutoBaseGrayConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("AUTO", "");
         testAutoBaseGrayPull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoBaseGrayLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoBaseGrayPush();
     }
 
@@ -193,7 +193,7 @@ public class GrayscaleRocketmqTest {
     public void testAutoBaseGrayPull() throws InterruptedException {
         createGrayscaleConfig("AUTO", "");
         initAndProduceMessage(true, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String grayResult = getPullGrayResult();
         int grayGrayCount = parseGrayMessageCount(grayResult);
         String baseResult = getPullBaseResult();
@@ -206,7 +206,7 @@ public class GrayscaleRocketmqTest {
     public void testAutoBaseGrayLitePull() throws InterruptedException {
         createGrayscaleConfig("AUTO", "");
         initAndProduceMessage(true, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String grayResult = getLitePullGrayResult();
         int grayBaseCount = parseBaseMessageCount(grayResult);
         int grayGrayCount = parseGrayMessageCount(grayResult);
@@ -221,7 +221,7 @@ public class GrayscaleRocketmqTest {
     public void testAutoBaseGrayPush() throws InterruptedException {
         createGrayscaleConfig("AUTO", "");
         initAndProduceMessage(true, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -236,15 +236,15 @@ public class GrayscaleRocketmqTest {
     public void testAutoExcBaseGrayConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("AUTO", "gray");
         testAutoExcBaseGrayPull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoExcBaseGrayLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testAutoExcBaseGrayPush();
     }
 
     private void testAutoExcBaseGrayPull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String grayResult = getPullGrayResult();
         int grayBaseCount = parseBaseMessageCount(grayResult);
         int grayGrayCount = parseGrayMessageCount(grayResult);
@@ -257,7 +257,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoExcBaseGrayLitePull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -270,7 +270,7 @@ public class GrayscaleRocketmqTest {
 
     private void testAutoExcBaseGrayPush() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -286,15 +286,15 @@ public class GrayscaleRocketmqTest {
     public void testBaseOnlyBaseConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("BASE", "");
         testBaseOnlyBasePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseOnlyBaseLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseOnlyBasePush();
     }
 
     private void testBaseOnlyBasePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -304,7 +304,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseOnlyBaseLitePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -314,7 +314,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseOnlyBasePush() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -327,15 +327,15 @@ public class GrayscaleRocketmqTest {
     public void testBaseExcOnlyBaseConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("BASE", "gray");
         testBaseExcOnlyBasePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseExcOnlyBaseLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseExcOnlyBasePush();
     }
 
     private void testBaseExcOnlyBasePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -345,7 +345,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseExcOnlyBaseLitePull() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -355,7 +355,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseExcOnlyBasePush() throws InterruptedException {
         initAndProduceMessage(false, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -368,15 +368,15 @@ public class GrayscaleRocketmqTest {
     public void testBaseBaseGrayConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("BASE", "");
         testBaseBaseGrayPull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseBaseGrayLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseBaseGrayPush();
     }
 
     private void testBaseBaseGrayPull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -389,7 +389,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseBaseGrayLitePull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -402,7 +402,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseBaseGrayPush() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -418,15 +418,15 @@ public class GrayscaleRocketmqTest {
     public void testBaseExcBaseGrayConsumeMessage() throws InterruptedException {
         createGrayscaleConfig("BASE", "gray");
         testBaseExcBaseGrayPull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseExcBaseGrayLitePull();
-        Thread.sleep(10000);
+        Thread.sleep(15000);
         testBaseExcBaseGrayPush();
     }
 
     private void testBaseExcBaseGrayPull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PULL);
-        Thread.sleep(50000);
+        Thread.sleep(240000);
         String baseResult = getPullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -439,7 +439,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseExcBaseGrayLitePull() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_LITE_PULL);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getLitePullBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -452,7 +452,7 @@ public class GrayscaleRocketmqTest {
 
     private void testBaseExcBaseGrayPush() throws InterruptedException {
         initAndProduceMessage(true, CONSUMER_TYPE_PUSH);
-        Thread.sleep(180000);
+        Thread.sleep(240000);
         String baseResult = getPushBaseResult();
         int baseBaseCount = parseBaseMessageCount(baseResult);
         int baseGrayCount = parseGrayMessageCount(baseResult);
@@ -472,7 +472,7 @@ public class GrayscaleRocketmqTest {
             // Trigger start gray consumer.
             restTemplate.getForObject("http://127.0.0.1:9010/initConsumer?consumerType={1}", String.class,
                     consumerType);
-            Thread.sleep(50000);
+            Thread.sleep(150000);
         }
 
         // Trigger start base consumer.
@@ -532,6 +532,8 @@ public class GrayscaleRocketmqTest {
     }
 
     private void createGrayscaleConfig(String consumeMode, String excludeTag) {
+        String testModel = System.getProperty("grayscale.rocketmq.integration.test.type");
+        kieClient.updateServiceNameLabels(testModel);
         String CONTENT = "enabled: true\n"
                 + "grayscale:\n"
                 + "  - consumerGroupTag: gray\n"
