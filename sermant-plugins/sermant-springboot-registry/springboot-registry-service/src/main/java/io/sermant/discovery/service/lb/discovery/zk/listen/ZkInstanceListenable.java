@@ -16,6 +16,7 @@
 
 package io.sermant.discovery.service.lb.discovery.zk.listen;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.plugin.service.PluginServiceManager;
@@ -171,7 +172,7 @@ public class ZkInstanceListenable implements InstanceListenable {
     }
 
     private Optional<io.sermant.discovery.entity.ServiceInstance> deserialize(ChildData childData) {
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(ZkDiscoveryClient.class.getClassLoader());
             final ServiceInstance<ZookeeperInstance> serviceInstance = serializer.deserialize(childData.getData());

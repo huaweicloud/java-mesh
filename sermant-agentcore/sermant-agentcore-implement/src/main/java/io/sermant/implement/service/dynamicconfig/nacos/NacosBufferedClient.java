@@ -22,6 +22,7 @@ import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.client.auth.impl.NacosAuthLoginConstant;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.config.ConfigManager;
 import io.sermant.core.service.dynamicconfig.config.DynamicConfig;
@@ -229,7 +230,7 @@ public class NacosBufferedClient implements Closeable {
      * @throws NacosInitException Connect to Nacos failed
      */
     private void createNacosClient(String connectString, Properties properties) {
-        ClassLoader tempClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader tempClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         try {
             nacosClient = new NacosClient(properties);

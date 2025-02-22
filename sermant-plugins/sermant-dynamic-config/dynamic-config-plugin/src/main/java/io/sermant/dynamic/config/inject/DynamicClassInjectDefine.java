@@ -17,6 +17,7 @@
 
 package io.sermant.dynamic.config.inject;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.service.inject.ClassInjectDefine;
 import io.sermant.core.utils.ClassUtils;
@@ -42,6 +43,7 @@ public abstract class DynamicClassInjectDefine implements ClassInjectDefine {
     @Override
     public boolean canInject() {
         return PluginConfigManager.getPluginConfig(DynamicConfiguration.class).isEnableDynamicConfig()
-                && ClassUtils.loadClass(REFRESH_CLASS, Thread.currentThread().getContextClassLoader()).isPresent();
+                && ClassUtils.loadClass(REFRESH_CLASS, ClassLoaderManager.getContextClassLoaderOrUserClassLoader())
+                .isPresent();
     }
 }

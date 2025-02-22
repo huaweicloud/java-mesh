@@ -17,6 +17,7 @@
 
 package io.sermant.flowcontrol.inject;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.service.inject.ClassInjectDefine;
 import io.sermant.core.utils.ClassUtils;
 
@@ -53,6 +54,8 @@ public class FlowControlSpringConfigurationInjectDefine implements ClassInjectDe
     }
 
     private boolean isLoadedClass(String className) {
-        return ClassUtils.loadClass(className, Thread.currentThread().getContextClassLoader(), true).isPresent();
+        return ClassUtils
+                .loadClass(className, ClassLoaderManager.getContextClassLoaderOrUserClassLoader(), true)
+                .isPresent();
     }
 }

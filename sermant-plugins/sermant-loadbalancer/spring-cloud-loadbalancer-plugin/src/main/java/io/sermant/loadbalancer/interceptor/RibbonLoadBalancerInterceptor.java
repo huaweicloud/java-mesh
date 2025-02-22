@@ -21,6 +21,7 @@ import com.netflix.loadbalancer.AbstractLoadBalancerRule;
 import com.netflix.loadbalancer.BaseLoadBalancer;
 import com.netflix.loadbalancer.IRule;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.plugin.agent.interceptor.AbstractInterceptor;
@@ -67,7 +68,7 @@ public class RibbonLoadBalancerInterceptor extends AbstractInterceptor {
 
     private final Function<RibbonLoadbalancerType, Optional<AbstractLoadBalancerRule>> ruleCreator = type -> {
         final String clazzName = type.getClazzName();
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             final Class<?> ruleClazz = contextClassLoader.loadClass(clazzName);
             return Optional.of((AbstractLoadBalancerRule) ruleClazz.newInstance());

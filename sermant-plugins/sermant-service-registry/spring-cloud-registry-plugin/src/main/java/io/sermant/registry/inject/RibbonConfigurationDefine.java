@@ -17,6 +17,7 @@
 
 package io.sermant.registry.inject;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.service.inject.ClassInjectDefine;
 import io.sermant.core.utils.ClassUtils;
 
@@ -52,6 +53,6 @@ public class RibbonConfigurationDefine extends BaseAutoConfigurationDefine {
     public boolean canInject() {
         return super.canInject() && ClassUtils.loadClass(
                 "org.springframework.cloud.netflix.ribbon.SpringClientFactory",
-                Thread.currentThread().getContextClassLoader(), false).isPresent();
+                ClassLoaderManager.getContextClassLoaderOrUserClassLoader(), false).isPresent();
     }
 }

@@ -17,6 +17,7 @@
 
 package io.sermant.registry.interceptors;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.plugin.config.PluginConfigManager;
@@ -99,7 +100,7 @@ public class SpringFactoriesInterceptor extends RegisterSwitchSupport {
 
     private void injectConfigurationsWithLowVersion(Object result, String factoryName) {
         final ClassInjectService service = ServiceManager.getService(ClassInjectService.class);
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         if (result instanceof List) {
             final List<String> convertedResult = (List<String>) result;
             CLASS_DEFINES.forEach(classInjectDefine -> {
@@ -113,7 +114,7 @@ public class SpringFactoriesInterceptor extends RegisterSwitchSupport {
 
     private void injectConfigurations(Object result) {
         final ClassInjectService service = ServiceManager.getService(ClassInjectService.class);
-        final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         final boolean isMultiValueMap = result instanceof MultiValueMap;
         if (result instanceof Map) {
             // Spring is a higher version of the list, and it is an immutable list that needs to be processed at one

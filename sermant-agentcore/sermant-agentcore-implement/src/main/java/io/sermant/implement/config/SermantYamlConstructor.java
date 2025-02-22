@@ -16,6 +16,7 @@
 
 package io.sermant.implement.config;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.exception.SermantRuntimeException;
 
 import org.yaml.snakeyaml.LoaderOptions;
@@ -35,7 +36,7 @@ public class SermantYamlConstructor extends Constructor {
      */
     public SermantYamlConstructor() {
         super(Object.class, new LoaderOptions());
-        loader = Thread.currentThread().getContextClassLoader();
+        loader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
     }
 
     /**

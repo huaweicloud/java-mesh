@@ -23,6 +23,7 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.client.naming.NacosNamingMaintainService;
 import com.alibaba.nacos.client.naming.NacosNamingService;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.registry.config.ConfigConstants;
 import io.sermant.registry.config.NacosRegisterConfig;
@@ -104,7 +105,7 @@ public class NacosServiceManager {
     }
 
     private NamingService createNewNamingService(Properties properties) throws NacosException {
-        ClassLoader tempClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader tempClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         try {
             return new NacosNamingService(properties);
@@ -114,7 +115,7 @@ public class NacosServiceManager {
     }
 
     private NamingMaintainService createNamingMaintainService(Properties properties) throws NacosException {
-        ClassLoader tempClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader tempClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         try {
             return new NacosNamingMaintainService(properties);

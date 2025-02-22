@@ -45,6 +45,8 @@ public class ClassLoaderManager {
 
     private static FrameworkClassLoader frameworkClassLoader;
 
+    private static ClassLoader userClassLoader;
+
     private ClassLoaderManager() {
     }
 
@@ -86,6 +88,23 @@ public class ClassLoaderManager {
                 return new PluginClassLoader(new URL[0], sermantClassLoader);
             }
         });
+    }
+
+    public static void setUserClassLoader(ClassLoader userClassLoader) {
+        ClassLoaderManager.userClassLoader = userClassLoader;
+    }
+
+    /**
+     * get ContextClassLoader or UserClassLoader
+     *
+     * @return ClassLoader
+     */
+    public static ClassLoader getContextClassLoaderOrUserClassLoader() {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        if (classLoader != null) {
+            return classLoader;
+        }
+        return userClassLoader;
     }
 
     public static SermantClassLoader getSermantClassLoader() {

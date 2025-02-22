@@ -16,6 +16,7 @@
 
 package io.sermant.registry.interceptors.health;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.registry.context.RegisterContext;
@@ -40,7 +41,7 @@ public class EurekaHealthInterceptor extends SingleStateCloseHandler {
     @Override
     protected void close() throws Exception {
         // Turn off the Eureka timer
-        final Class<?> discoveryClientClass = Thread.currentThread().getContextClassLoader()
+        final Class<?> discoveryClientClass = ClassLoaderManager.getContextClassLoaderOrUserClassLoader()
                 .loadClass("com.netflix.discovery.DiscoveryClient");
         discoveryClientClass.getDeclaredMethod("shutdown").invoke(target);
         LOGGER.warning("Eureka register center has been closed by user.");

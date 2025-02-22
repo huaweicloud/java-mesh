@@ -17,6 +17,7 @@
 
 package io.sermant.loadbalancer.interceptor;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.plugin.agent.interceptor.AbstractInterceptor;
@@ -117,7 +118,7 @@ public class UrlInterceptor extends AbstractInterceptor {
             }
             supportRules = new HashSet<>();
             final Optional<Class<?>> lbClazz = ClassUtils
-                    .loadClass(lbClassName, Thread.currentThread().getContextClassLoader(), true);
+                    .loadClass(lbClassName, ClassLoaderManager.getContextClassLoaderOrUserClassLoader(), true);
             if (!lbClazz.isPresent()) {
                 return;
             }
@@ -141,7 +142,7 @@ public class UrlInterceptor extends AbstractInterceptor {
     }
 
     private boolean isAlibaba() {
-        return ClassUtils.loadClass(ALIBABA_LOADER, Thread.currentThread().getContextClassLoader(), false)
+        return ClassUtils.loadClass(ALIBABA_LOADER, ClassLoaderManager.getContextClassLoaderOrUserClassLoader(), false)
                 .isPresent();
     }
 

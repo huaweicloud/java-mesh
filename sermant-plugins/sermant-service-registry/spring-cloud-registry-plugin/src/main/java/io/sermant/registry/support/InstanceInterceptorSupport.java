@@ -17,6 +17,7 @@
 
 package io.sermant.registry.support;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.config.PluginConfigManager;
 import io.sermant.core.utils.ClassLoaderUtils;
@@ -74,7 +75,7 @@ public abstract class InstanceInterceptorSupport extends RegisterSwitchSupport {
      */
     protected final Class<?> getInstanceClass(String className) {
         return cacheClasses.computeIfAbsent(className, fn -> {
-            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
             Class<?> result = null;
             try {
                 result = ClassLoaderUtils.defineClass(className, contextClassLoader,

@@ -16,6 +16,7 @@
 
 package io.sermant.discovery.interceptors.httpclient;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.plugin.agent.entity.ExecuteContext;
 import io.sermant.core.plugin.service.PluginServiceManager;
@@ -92,7 +93,7 @@ public class HttpClient4xInterceptor extends MarkInterceptor {
         RequestInterceptorUtils.printRequestLog("HttpClient", hostAndPath);
         invokerService.invoke(
                         buildInvokerFunc(hostAndPath, httpRequest, context),
-                        buildExFunc(httpRequest, Thread.currentThread().getContextClassLoader()),
+                        buildExFunc(httpRequest, ClassLoaderManager.getContextClassLoaderOrUserClassLoader()),
                         hostAndPath.get(HttpConstants.HTTP_URI_SERVICE))
                 .ifPresent(result -> this.setResultOrThrow(context, result,
                         hostAndPath.get(HttpConstants.HTTP_URI_PATH)));
@@ -111,11 +112,11 @@ public class HttpClient4xInterceptor extends MarkInterceptor {
     private Function<InvokerContext, Object> buildInvokerFunc(Map<String, String> hostAndPath, HttpRequest httpRequest,
             ExecuteContext context) {
         final String method = httpRequest.getRequestLine().getMethod();
-        final ClassLoader appClassloader = Thread.currentThread().getContextClassLoader();
+        final ClassLoader appClassloader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         final AtomicReference<HttpResponse> lastResult = new AtomicReference<>();
         return invokerContext -> {
             tryClose(lastResult.get());
-            final ClassLoader pluginClassloader = Thread.currentThread().getContextClassLoader();
+            final ClassLoader pluginClassloader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
             Thread.currentThread().setContextClassLoader(appClassloader);
             try {
                 final ServiceInstance serviceInstance = invokerContext.getServiceInstance();
@@ -158,7 +159,7 @@ public class HttpClient4xInterceptor extends MarkInterceptor {
             if (ex instanceof IOException) {
                 return ex;
             }
-            final ClassLoader pluginClassloader = Thread.currentThread().getContextClassLoader();
+            final ClassLoader pluginClassloader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
             Thread.currentThread().setContextClassLoader(appClassloader);
             try {
                 return new ErrorCloseableHttpResponse(ex, httpRequest.getProtocolVersion());

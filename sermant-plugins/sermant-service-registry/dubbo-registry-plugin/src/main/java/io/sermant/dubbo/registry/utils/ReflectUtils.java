@@ -16,6 +16,7 @@
 
 package io.sermant.dubbo.registry.utils;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.utils.ClassLoaderUtils;
 import io.sermant.dubbo.registry.cache.DubboCache;
@@ -100,7 +101,7 @@ public class ReflectUtils {
      * @return Host class
      */
     public static Optional<Class<?>> defineClass(String className) {
-        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader contextClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         try {
             return Optional.of(ClassLoaderUtils.defineClass(className, contextClassLoader,
                     ClassLoaderUtils.getClassResource(ReflectUtils.class.getClassLoader(), className)));

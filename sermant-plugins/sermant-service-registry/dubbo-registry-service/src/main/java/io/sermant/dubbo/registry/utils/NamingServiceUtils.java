@@ -21,6 +21,7 @@ import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 
+import io.sermant.core.classloader.ClassLoaderManager;
 import io.sermant.core.common.LoggerFactory;
 import io.sermant.core.utils.StringUtils;
 import io.sermant.registry.config.NacosRegisterConfig;
@@ -57,7 +58,7 @@ public class NamingServiceUtils {
     public static NamingService buildNamingService(Map<String, String> parameters, NacosRegisterConfig registerConfig,
         RegisterServiceCommonConfig commonConfig) {
         Properties nacosProperties = buildNacosProperties(parameters, registerConfig, commonConfig);
-        ClassLoader tempClassLoader = Thread.currentThread().getContextClassLoader();
+        ClassLoader tempClassLoader = ClassLoaderManager.getContextClassLoaderOrUserClassLoader();
         Thread.currentThread().setContextClassLoader(NamingServiceUtils.class.getClassLoader());
         try {
             return NacosFactory.createNamingService(nacosProperties);
