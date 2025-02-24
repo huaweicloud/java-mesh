@@ -113,7 +113,7 @@ public class RocketMqReflectUtils {
      * @param paramsType paramsType
      * @param params params
      */
-    public static void setSubscriptionDatae(Object subscriptionData, String methodName, Class<?>[] paramsType,
+    public static void setSubscriptionData(Object subscriptionData, String methodName, Class<?>[] paramsType,
             Object[] params) {
         ReflectUtils.invokeMethod(subscriptionData, methodName, paramsType, params);
     }
