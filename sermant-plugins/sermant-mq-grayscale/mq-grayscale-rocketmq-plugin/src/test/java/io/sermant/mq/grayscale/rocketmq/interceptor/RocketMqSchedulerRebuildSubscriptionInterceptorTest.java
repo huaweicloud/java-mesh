@@ -49,12 +49,16 @@ public class RocketMqSchedulerRebuildSubscriptionInterceptorTest extends RocketM
         ExecuteContext context = ExecuteContext.forMemberMethod(rebalanced, null, null, null, null);
         SubscriptionData subscriptionData = new SubscriptionData();
         subscriptionData.setTopic("TOPIC_TEST");
+        SubscriptionData retrySubscriptionData = new SubscriptionData();
+        retrySubscriptionData.setTopic("%RETRY%consumerGroup");
         ConcurrentMap<String, SubscriptionData> map = new ConcurrentHashMap<>();
         map.put("test", subscriptionData);
+        map.put("testRetry", retrySubscriptionData);
         context.afterMethod(map, null);
         RocketMqSchedulerRebuildSubscriptionInterceptor interceptor
                 = new RocketMqSchedulerRebuildSubscriptionInterceptor();
         interceptor.doAfter(context);
         Assert.assertEquals("(x_lane_canary in ('gray'))", subscriptionData.getSubString());
+        Assert.assertEquals("(x_lane_canary in ('gray'))", retrySubscriptionData.getSubString());
     }
 }
