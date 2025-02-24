@@ -7,6 +7,7 @@
 # 'plugins' is used to configure static plugins. The plugins take effect when Sermant starts by premain. Plugins that support static installation are configured and cannot be uninstalled
 plugins:
   - flowcontrol
+  - tag-transmission
   - service-router
   - service-registry
   - loadbalancer
@@ -16,7 +17,6 @@ plugins:
   - mq-consume-prohibition
   - service-removal
   - service-visibility
-  - tag-transmission
   - database-write-prohibition
   - mq-grayscale
 # 'dynamicPlugins' is used to configure plugins that support dynamic installation. The plugins take effect when Sermant starts by agentmain. allows uninstallation:

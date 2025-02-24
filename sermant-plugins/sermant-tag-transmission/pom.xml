@@ -53,6 +53,7 @@
                 <module>tag-transmission-dubbo2.7.x-plugin</module>
                 <module>tag-transmission-dubbo3.x-plugin</module>
                 <module>tag-transmission-service</module>
+                <module>tag-transmission-rest-feign-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -75,6 +76,7 @@
                 <module>tag-transmission-dubbo2.7.x-plugin</module>
                 <module>tag-transmission-dubbo3.x-plugin</module>
                 <module>tag-transmission-service</module>
+                <module>tag-transmission-rest-feign-plugin</module>
             </modules>
         </profile>
         <profile>
@@ -97,6 +99,7 @@
                 <module>tag-transmission-dubbo2.7.x-plugin</module>
                 <module>tag-transmission-dubbo3.x-plugin</module>
                 <module>tag-transmission-service</module>
+                <module>tag-transmission-rest-feign-plugin</module>
             </modules>
         </profile>
     </profiles>
