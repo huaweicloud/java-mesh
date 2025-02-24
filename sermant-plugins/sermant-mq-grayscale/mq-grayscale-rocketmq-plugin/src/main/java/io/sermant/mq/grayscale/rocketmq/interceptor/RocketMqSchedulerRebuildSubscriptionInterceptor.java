@@ -85,7 +85,6 @@ public class RocketMqSchedulerRebuildSubscriptionInterceptor extends RocketMqAbs
             String retryTopic = RocketMqReflectUtils.getTopic(subData);
             String sqlSubstr = RocketMqReflectUtils.getSubString(subscriptionData);
             if (retryTopic.contains(RETYPE)) {
-                String originSubData = RocketMqReflectUtils.getSubString(subData);
                 RocketMqReflectUtils.getTagsSet(subData).clear();
                 RocketMqReflectUtils.getCodeSet(subData).clear();
                 RocketMqReflectUtils.setSubscriptionDatae(subData, "setSubString",
@@ -94,6 +93,7 @@ public class RocketMqSchedulerRebuildSubscriptionInterceptor extends RocketMqAbs
                     new Class[]{String.class}, new Object[]{"SQL92"});
                 RocketMqReflectUtils.setSubscriptionDatae(subData, "setSubVersion",
                     new Class[]{long.class}, new Object[]{System.currentTimeMillis()});
+                String originSubData = RocketMqReflectUtils.getSubString(subData);
                 LOGGER.warning(String.format(Locale.ENGLISH, "update retry topic [%s] SQL92 expression, "
                         + "originTopic: [%s], originSubStr: [%s], newSubStr: [%s]", retryTopic,
                     originTopic, originSubData, sqlSubstr));
