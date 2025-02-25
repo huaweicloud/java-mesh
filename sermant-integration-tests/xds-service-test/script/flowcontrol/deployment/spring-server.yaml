@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-server-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-server
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: spring-server
+        version: v1
+    spec:
+      containers:
+      - name: spring-server
+        image: spring-server:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8081
+        env:
+        - name: SERVER_VERSION
+          value: "v1"
+        - name: ZOOKEEPER_IP
+          value: "zookeeper.default.svc.cluster.local"
+        - name: ZOOKEEPER_ENABLED
+          value: "true"
+        - name: agent_service_xds_service_enable
+          value: "true"
+        - name: xds_flow_control_config_enable
+          value: "true"
+        - name: xds_service_discovery_enabled
+          value: "false"
+        - name: agent_service_dynamic_config_enable
+          value: "false"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-DstatusCode=200 -Dservice.meta.service=spring-server -javaagent:/home/agent/sermant-agent.jar"
+      imagePullSecrets:
+        - name: default-secret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-server-v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-server
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: spring-server
+        version: v2
+    spec:
+      containers:
+        - name: spring-server
+          image: spring-server:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8081
+          env:
+          - name: SERVER_VERSION
+            value: "v2"
+          - name: ZOOKEEPER_IP
+            value: "zookeeper.default.svc.cluster.local"
+          - name: ZOOKEEPER_ENABLED
+            value: "true"
+          - name: agent_service_xds_service_enable
+            value: "true"
+          - name: xds_flow_control_config_enable
+            value: "true"
+          - name: xds_service_discovery_enabled
+            value: "false"
+          - name: agent_service_dynamic_config_enable
+            value: "false"
+          - name: JAVA_TOOL_OPTIONS
+            value: "-DstatusCode=502 -Dservice.meta.service=spring-server -javaagent:/home/agent/sermant-agent.jar"
+      imagePullSecrets:
+        - name: default-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-server

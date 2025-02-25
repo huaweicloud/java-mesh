@@ -22,7 +22,7 @@ import io.sermant.flowcontrol.common.handler.retry.Retry;
 import io.sermant.flowcontrol.common.xds.retry.RetryCondition;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
+import java.io.InterruptedIOException;
 import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 
@@ -50,15 +50,16 @@ public class ResetRetryCondition implements RetryCondition {
         if (StringUtils.isEmpty(message)) {
             return false;
         }
-        if (isRequestTimeoutException(ex, message)) {
+        message = message.toLowerCase(Locale.ROOT);
+        if (isRequestTimeoutException(realException, message)) {
             return true;
         }
         return realException instanceof IOException
-                && (message.contains("Connection reset") || message.toLowerCase(Locale.ROOT).contains("broken pipe"));
+                && (message.contains("connection reset") || message.toLowerCase(Locale.ROOT).contains("broken pipe"));
     }
 
     private static boolean isRequestTimeoutException(Throwable ex, String message) {
-        return (ex instanceof SocketTimeoutException || ex instanceof TimeoutException)
-                && message.contains("Read timed out");
+        return (ex instanceof InterruptedIOException || ex instanceof TimeoutException)
+                && (message.contains("read timed out") || message.contains("timeout"));
     }
 }

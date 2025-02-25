@@ -1,0 +1,97 @@
+name: "xDS router an lb Test"
+description: "Auto test for xds router and lb with router plugin"
+runs:
+  using: composite
+  steps:
+    - name: prepare image
+      shell: bash
+      run: |
+        echo -e "plugins:\n  - flowcontrol" > sermant-agent-${{ env.sermantVersion }}/agent/config/plugins.yaml
+        sudo sed -i '/x-sermant-retriable-status-codes:/a\ \ \ - 502' sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/config/config.yaml
+        sudo sed -i '/x-sermant-retriable-header-names:/a\ \ \ - needRetry' sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/config/config.yaml
+        cat sermant-agent-${{ env.sermantVersion }}/agent/config/plugins.yaml
+        cat sermant-agent-${{ env.sermantVersion }}/agent/pluginPackage/flowcontrol/config/config.yaml
+        cp -r sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-client/
+        cp -r sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-cloud-client/
+        cp -r sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-server/
+        mvn clean package -Dspringboot.version=${{ matrix.springBootVersion }} -Dsnakeyaml.version=${{ matrix.snakeyamlVersion }} -Dspringcloud.version=${{ matrix.springCloudVersion }} -Dhttpclient.version=${{ matrix.httpClientVersion }} -Dokhttp2.version=${{ matrix.okHttp2Version }} -Dhttpclient.async.version=${{ matrix.httpAsyncClientVersion }} -Dokhttp3.version=${{ matrix.okHttp3Version }} -DskipTests -pl spring-common,spring-client,spring-cloud-client,spring-server -Pxds-flowcontrol --file sermant-integration-tests/xds-service-test/pom.xml
+    - name: build docker image
+      shell: bash
+      run: |
+        cd sermant-integration-tests/xds-service-test/product/spring-server/
+        minikube image build -t spring-server:1.0.0 .
+        cd ../spring-client/
+        minikube image build -t spring-client:1.0.0 .
+        cd ../spring-cloud-client/
+        minikube image build -t spring-cloud-client:1.0.0 .
+        eval $(minikube docker-env)
+        docker images
+    - name: start zookeeper
+      shell: bash
+      run: |
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/zookeeper.yaml
+        kubectl wait --for=condition=ready pod -l app=zookeeper --timeout=10s
+        sleep 15s
+    - name: start spring-client
+      shell: bash
+      run: |
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-client-sermant-xds-flowcontrol.yaml
+        kubectl wait --for=condition=ready pod -l app=spring-client --timeout=10s
+        sleep 15s
+        nohup kubectl port-forward svc/spring-client 8080:8080 &
+        sleep 2s
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8080/checkStatus 150
+    - name: start spring-cloud-client
+      shell: bash
+      run: |
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-cloud-client-sermant-xds-flowcontrol.yaml
+        kubectl wait --for=condition=ready pod -l app=spring-cloud-client --timeout=10s
+        sleep 15s
+        nohup kubectl port-forward svc/spring-cloud-client 8082:8082 &
+        sleep 2s
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8082/router/checkStatus 150
+    - name: start spring-server
+      shell: bash
+      run: |
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-server.yaml
+        kubectl wait --for=condition=ready pod -l app=spring-server --timeout=10s
+        sleep 15s
+        nohup kubectl port-forward svc/spring-server 8081:8081 &
+        sleep 100s
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8081/hello 150
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:8081/hello 150
+        bash ./sermant-integration-tests/scripts/checkService.sh "http://127.0.0.1:8080/flowControl/testHttpClient?host=spring-server&version=v1&path=testFault" 150
+        bash ./sermant-integration-tests/scripts/checkService.sh "http://127.0.0.1:8080/flowControl/testOkHttp2?host=spring-server&version=v1&path=testFault" 150
+        bash ./sermant-integration-tests/scripts/checkService.sh "http://127.0.0.1:8080/flowControl/testHttpUrlConnection?host=spring-server&version=v1&path=testFault" 150
+        bash ./sermant-integration-tests/scripts/checkService.sh "http://127.0.0.1:8082/flowControl/testOkHttp3?host=spring-server&version=v1&path=testFault" 150
+        pkill -f "kubectl port-forward svc/spring-server"
+    - name: test flowcontrol
+      shell: bash
+      run: |
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-destination-circuitbreaker.yaml
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-fault.yaml
+        sleep 5s
+        mvn test -Dxds.service.integration.test.type=FLOW_CONTROL_FAULT --file \
+            sermant-integration-tests/xds-service-test/xds-service-integration-test/pom.xml
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-fault.yaml
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-retry.yaml
+        sleep 5s
+        mvn test -Dxds.service.integration.test.type=FLOW_CONTROL_RETRY --file \
+            sermant-integration-tests/xds-service-test/xds-service-integration-test/pom.xml
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-retry.yaml
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-circuitbreaker.yaml
+        sleep 5s
+        mvn test -Dxds.service.integration.test.type=FLOW_CONTROL_CIRCUIT_BREAKER --file \
+            sermant-integration-tests/xds-service-test/xds-service-integration-test/pom.xml
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-circuitbreaker.yaml
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-virtureservice-ratelimit.yaml
+        kubectl apply -f sermant-integration-tests/xds-service-test/script/flowcontrol/flowcontrol-rule/spring-server-envoyfilter.yaml
+        sleep 5s
+        mvn test -Dxds.service.integration.test.type=FLOW_CONTROL_RATE_LIMIT --file \
+            sermant-integration-tests/xds-service-test/xds-service-integration-test/pom.xml
+    - name: close all service
+      shell: bash
+      run: |
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-client-sermant-xds-flowcontrol.yaml
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-cloud-client-sermant-xds-flowcontrol.yaml
+        kubectl delete -f sermant-integration-tests/xds-service-test/script/flowcontrol/deployment/spring-server.yaml

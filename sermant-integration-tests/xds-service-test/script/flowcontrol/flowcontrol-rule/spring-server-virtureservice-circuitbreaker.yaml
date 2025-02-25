@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: spring-server-virtual-service-circuit-breaker
+spec:
+  hosts:
+  - spring-server
+  http:
+  - name: "testRequestCircuitBreaker"
+    match:
+    - headers:
+        version:
+          exact: v1
+      uri:
+        exact: /testRequestCircuitBreaker
+      ignoreUriCase: false
+    route:
+    - destination:
+        host: spring-server
+        subset: v2
+        port:
+          number: 8081
+  - name: "testInstanceCircuitBreakerV2"
+    match:
+      - headers:
+          version:
+            exact: v2
+        uri:
+          exact: /testInstanceCircuitBreaker
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v3
+          port:
+            number: 8081
+  - name: "testInstanceCircuitBreakerV3"
+    match:
+      - headers:
+          version:
+            exact: v3
+        uri:
+          exact: /testInstanceCircuitBreaker
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v4
+          port:
+            number: 8081
