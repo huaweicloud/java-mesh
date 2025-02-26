@@ -1,0 +1,215 @@
+servicecomb:
+  matchGroup:
+    demo-lb: |
+      matches:
+        - serviceName: dubbo-integration-provider
+    demo-fault-null: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.faultNull"
+    demo-fault-throw: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.faultThrowEx"
+    demo-fault-delay: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.faultDelay"
+    demo-retry: |
+      matches:
+        - apiPath:
+            prefix: "io.sermant.integration.service.FlowControlService.retry"
+          serviceName: dubbo-integration-provider
+          method:
+          - POST
+    demo-rateLimiting: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimiting"
+    demo-rateLimiting-prefix: |
+      matches:
+        - apiPath:
+            prefix: "io.sermant.integration.service.FlowControlService.rateLimitingPref"
+    demo-rateLimiting-suffix: |
+      matches:
+        - apiPath:
+            suffix: "rateLimitingSuffix"
+    demo-rateLimiting-contains: |
+      matches:
+        - apiPath:
+            contains: "rateLimitingContains"
+    demo-rateLimiting-version: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlVersionService:1.0.0.rateLimitingWithVersion"
+    demo-rateLimiting-match-application: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithApplication"
+          serviceName: dubbo-integration-provider
+    demo-rateLimiting-match-attachement: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              prefix: attachment
+            key2:
+              exact: 999
+    demo-rateLimiting-match-attachement-exact: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              exact: flowControlExact
+            key2:
+              exact: 999
+    demo-rateLimiting-match-attachement-prefix: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              prefix: flowControlPr
+            key2:
+              exact: 999
+    demo-rateLimiting-match-attachement-suffix: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              suffix: Suffix
+            key2:
+              exact: 999
+    demo-rateLimiting-match-attachement-contains: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              contains: Contains
+            key2:
+              exact: 999
+    demo-rateLimiting-match-attachement-compare: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.rateLimitingWithHeader"
+          serviceName: dubbo-integration-provider
+          headers:
+            key:
+              compare: ">100"
+            key2:
+              exact: 999
+    demo-circuitBreaker-timed: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.cirSlowInvoker"
+    demo-circuitBreaker-exception: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.cirEx"
+    demo-instance-isolation-timed: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.instanceSlowInvoker"
+    demo-instance-isolation-exception: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.instanceEx"
+    demo-bulkhead: |
+      matches:
+        - apiPath:
+            exact: "io.sermant.integration.service.FlowControlService.bulkhead"
+  rateLimiting:
+    demo-rateLimiting: |
+      rate: 1
+    demo-rateLimiting-prefix: |
+      rate: 1
+    demo-rateLimiting-suffix: |
+      rate: 1
+    demo-rateLimiting-contains: |
+      rate: 1
+    demo-rateLimiting-version: |
+      rate: 1
+    demo-rateLimiting-match-application: |
+      rate: 1
+    demo-rateLimiting-match-attachement: |
+      rate: 1
+    demo-rateLimiting-match-attachement-exact: |
+      rate: 1
+    demo-rateLimiting-match-attachement-prefix: |
+      rate: 1
+    demo-rateLimiting-match-attachement-suffix: |
+      rate: 1
+    demo-rateLimiting-match-attachement-contains: |
+      rate: 1
+    demo-rateLimiting-match-attachement-compare: |
+      rate: 1
+  retry:
+    demo-retry: |
+      maxAttempts: 3
+      waitDuration: 10
+      retryOnResponseStatus:
+      - 500
+  circuitBreaker:
+    demo-instance-isolation-timed: |
+      minimumNumberOfCalls: 2
+      name: 熔断
+      slidingWindowSize: 10000
+      slidingWindowType: time
+      slowCallDurationThreshold: "44"
+      slowCallRateThreshold: 60
+      waitDurationInOpenState: 5s
+    demo-instance-isolation-exception: |
+      failureRateThreshold: 50
+      minimumNumberOfCalls: 2
+      name: 熔断
+      slidingWindowSize: 10000
+      slidingWindowType: time
+      waitDurationInOpenState: 5s
+    demo-circuitBreaker-timed: |
+      minimumNumberOfCalls: 2
+      name: 熔断
+      slidingWindowSize: 10000
+      slidingWindowType: time
+      slowCallDurationThreshold: "44"
+      slowCallRateThreshold: 60
+      waitDurationInOpenState: 5s
+    demo-circuitBreaker-exception: |
+      failureRateThreshold: 50
+      minimumNumberOfCalls: 2
+      name: 熔断
+      slidingWindowSize: 10000
+      slidingWindowType: time
+      waitDurationInOpenState: 5s
+  bulkhead:
+    demo-bulkhead: |
+      maxConcurrentCalls: 1
+      maxWaitDuration: 10
+  faultInjection:
+    demo-fault-null: |
+      type: abort
+      percentage: 100
+      fallbackType: ReturnNull
+      forceClosed: false
+    demo-fault-throw: |
+      type: abort
+      percentage: 100
+      fallbackType: ThrowException
+      forceClosed: false
+      errorCode: 503
+    demo-fault-delay: |
+      type: delay
+      percentage: 100
+      delayTime: 2000
+      forceClosed: false
+  loadbalance:
+    demo-lb: |
+      rule: LeastActive

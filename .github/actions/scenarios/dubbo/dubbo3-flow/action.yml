@@ -1,0 +1,78 @@
+name: "Dubbo3 Flow Test"
+description: "Auto test for dubbo3 flow"
+runs:
+  using: "composite"
+  steps:
+    - name: entry
+      uses: ./.github/actions/common/entry
+      with:
+        log-dir: ./logs/dubbo3-flow
+    - name: add load rule.yaml configuration for dubbo3 flow test
+      shell: bash
+      run: |
+        mv -f sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/ProviderApplication.java sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/ProviderApplication.java.banck
+        mv -f sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/Dubbo3ProviderApplication.java.banck sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/Dubbo3ProviderApplication.java
+    - name: package dubbo 3.0.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-0'
+      run: mvn package -Ddubbo.version=3.0.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.1.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-1'
+      run: mvn package -Ddubbo.version=3.1.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: package dubbo 3.2.x tests
+      shell: bash
+      if: matrix.dubbo-version == '3-2'
+      run: mvn package -Ddubbo.version=3.2.${{ matrix.dubbo-versions }} -DskipTests --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: start provider service
+      shell: bash
+      env:
+        SERVER_PORT: 28022
+        DUBBO_PROTOCOL_PORT: 28822
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-provider -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-provider/target/dubbo-integration-provider.jar > ${{ env.logDir }}/dubbo-provider.log 2>&1 &
+    - name: waiting for providers start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:28022/actuator/health 120
+    - name: start consumer service
+      shell: bash
+      env:
+        SERVER_PORT: 28020
+        DUBBO_PROTOCOL_PORT: 28820
+      run: |
+        nohup java -javaagent:sermant-agent-${{ env.sermantVersion }}/agent/sermant-agent.jar=appName=dubbo-integration-consumer -jar \
+        sermant-integration-tests/dubbo-test/dubbo-${{ env.projectPath }}-integration-consumer/target/dubbo-integration-consumer.jar > ${{ env.logDir }}/dubbo-consumer.log 2>&1 &
+    - name: waiting for consumers start
+      shell: bash
+      run: |
+        bash ./sermant-integration-tests/scripts/checkService.sh http://127.0.0.1:28020/actuator/health 120
+    - name: integration test
+      shell: bash
+      env:
+        TEST_TYPE: dubbo3-flow
+      run: mvn test --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: reset Application file
+      shell: bash
+      run: |
+        mv -f sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/ProviderApplication.java.banck sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/ProviderApplication.java
+        mv -f sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/Dubbo3ProviderApplication.java sermant-integration-tests/dubbo-test/dubbo-2-7-integration-provider/src/main/java/io/sermant/integration/Dubbo3ProviderApplication.java.banck
+    - name: mvn clean
+      shell: bash
+      run: mvn clean --file sermant-integration-tests/dubbo-test/pom.xml
+    - name: exit
+      if: always()
+      uses: ./.github/actions/common/exit
+      with:
+        processor-keyword: dubbo
+    - name: if failure then upload error log
+      uses: actions/upload-artifact@v4
+      if: ${{ failure() || cancelled() }}
+      with:
+        name: (test-for-dubbo3-flow)-(${{ matrix.dubbo-version }}-${{ matrix.dubbo-versions }})-logs
+        path: |
+          ./*.log
+          ./logs/**/*.log
+        if-no-files-found: warn
+        retention-days: 2
