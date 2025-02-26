@@ -285,14 +285,14 @@ public class RocketMqSubscriptionDataUtils {
             newSubStr = SELECT_ALL_MESSAGE_SQL;
         }
         if (EXPRESSION_TYPE_TAG.equals(RocketMqReflectUtils.getExpressionType(subscriptionData))) {
-            RocketMqReflectUtils.setSubscriptionDatae(subscriptionData, "setExpressionType",
+            RocketMqReflectUtils.setSubscriptionData(subscriptionData, "setExpressionType",
                     new Class[]{String.class}, new Object[]{"SQL92"});
             RocketMqReflectUtils.getTagsSet(subscriptionData).clear();
             RocketMqReflectUtils.getCodeSet(subscriptionData).clear();
         }
-        RocketMqReflectUtils.setSubscriptionDatae(subscriptionData, "setSubString",
+        RocketMqReflectUtils.setSubscriptionData(subscriptionData, "setSubString",
                 new Class[]{String.class}, new Object[]{newSubStr});
-        RocketMqReflectUtils.setSubscriptionDatae(subscriptionData, "setSubVersion",
+        RocketMqReflectUtils.setSubscriptionData(subscriptionData, "setSubVersion",
                 new Class[]{long.class}, new Object[]{System.currentTimeMillis()});
         LOGGER.warning(String.format(Locale.ENGLISH, "update [key: %s] SQL92 subscriptionData, originSubStr: "
                 + "[%s], newSubStr: [%s]", subscribeScope, originSubData, newSubStr));
