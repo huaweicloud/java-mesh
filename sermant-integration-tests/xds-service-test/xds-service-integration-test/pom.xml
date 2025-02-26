@@ -20,6 +20,7 @@
         <slf4j.version>1.7.35</slf4j.version>
         <jupiter.version>5.8.1</jupiter.version>
         <maven.surefire.plugin.version>3.0.0</maven.surefire.plugin.version>
+        <spring.common.version>1.0.0</spring.common.version>
     </properties>
 
     <dependencies>
@@ -58,6 +59,11 @@
             <artifactId>commons-logging</artifactId>
             <version>${commons-log.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
     </dependencies>
 

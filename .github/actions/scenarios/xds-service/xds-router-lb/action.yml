@@ -9,7 +9,7 @@ runs:
         cp -r sermant-integration-tests/xds-service-test/product/sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-client/
         cp -r sermant-integration-tests/xds-service-test/product/sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-cloud-client/
         cp -r sermant-integration-tests/xds-service-test/product/sermant-agent-*/agent sermant-integration-tests/xds-service-test/product/spring-server/
-        mvn package -Dspringboot.version=${{ matrix.springBootVersion }} -Dsnakeyaml.version=${{ matrix.snakeyamlVersion }} -Dspringcloud.version=${{ matrix.springCloudVersion }} -Dhttpclient.version=${{ matrix.httpClientVersion }} -Dokhttp2.version=${{ matrix.okHttp2Version }} -Dhttpclient.async.version=${{ matrix.httpAsyncClientVersion }} -Dokhttp3.version=${{ matrix.okHttp3Version }} -DskipTests -pl spring-client,spring-cloud-client,spring-server -Pxds-router-lb --file \
+        mvn package -Dspringboot.version=${{ matrix.springBootVersion }} -Dsnakeyaml.version=${{ matrix.snakeyamlVersion }} -Dspringcloud.version=${{ matrix.springCloudVersion }} -Dhttpclient.version=${{ matrix.httpClientVersion }} -Dokhttp2.version=${{ matrix.okHttp2Version }} -Dhttpclient.async.version=${{ matrix.httpAsyncClientVersion }} -Dokhttp3.version=${{ matrix.okHttp3Version }} -DskipTests -pl spring-common,spring-client,spring-cloud-client,spring-server -Pxds-router-lb --file \
         sermant-integration-tests/xds-service-test/pom.xml
     - name: build docker image
       shell: bash

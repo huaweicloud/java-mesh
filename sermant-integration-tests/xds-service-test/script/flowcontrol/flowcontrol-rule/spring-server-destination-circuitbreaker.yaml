@@ -1,0 +1,37 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: spring-server-destinationrule
+spec:
+  host: spring-server.default.svc.cluster.local
+  trafficPolicy:
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+    - name: v1
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+    - name: v2
+      trafficPolicy:
+        connectionPool:
+          http:
+            http2MaxRequests: 1
+    - name: v3
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+        outlierDetection:
+          consecutiveGatewayErrors: 20
+          interval: 10s
+          baseEjectionTime: 5s
+          maxEjectionPercent: 100
+    - name: v4
+      trafficPolicy:
+        loadBalancer:
+          simple: ROUND_ROBIN
+        outlierDetection:
+          consecutive5xxErrors: 20
+          interval: 10s
+          baseEjectionTime: 5s
+          maxEjectionPercent: 100

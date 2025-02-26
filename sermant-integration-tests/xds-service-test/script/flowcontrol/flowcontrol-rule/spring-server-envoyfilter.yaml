@@ -1,0 +1,85 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: filter-local-ratelimit
+  namespace: istio-system
+spec:
+  configPatches:
+    - applyTo: HTTP_ROUTE
+      match:
+        routeConfiguration:
+          vhost:
+            route:
+              name: testRateLimitV1
+      patch:
+        operation: MERGE
+        value:
+          typed_per_filter_config:
+            envoy.filters.http.local_ratelimit:
+              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+              value:
+                token_bucket:
+                  max_tokens: 3
+                  tokens_per_fill: 3
+                  fill_interval: 10s
+                filter_enabled:
+                  default_value:
+                    numerator: 0
+                    denominator: HUNDRED
+                response_headers_to_add:
+                  header:
+                    key: x-local-rate-limit
+                    value: 'true'
+    - applyTo: HTTP_ROUTE
+      match:
+        routeConfiguration:
+          vhost:
+            route:
+              name: testRateLimitV2
+      patch:
+        operation: MERGE
+        value:
+          typed_per_filter_config:
+            envoy.filters.http.local_ratelimit:
+              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+              value:
+                token_bucket:
+                  max_tokens: 3
+                  tokens_per_fill: 3
+                  fill_interval: 10s
+                filter_enabled:
+                  default_value:
+                    numerator: 50
+                    denominator: HUNDRED
+                response_headers_to_add:
+                  header:
+                    key: x-local-rate-limit
+                    value: 'true'
+    - applyTo: HTTP_ROUTE
+      match:
+        routeConfiguration:
+          vhost:
+            route:
+              name: testRateLimitV3
+      patch:
+        operation: MERGE
+        value:
+          typed_per_filter_config:
+            envoy.filters.http.local_ratelimit:
+              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              type_url: type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit
+              value:
+                token_bucket:
+                  max_tokens: 2
+                  tokens_per_fill: 2
+                  fill_interval: 10s
+                filter_enabled:
+                  default_value:
+                    numerator: 100
+                    denominator: HUNDRED
+                response_headers_to_add:
+                  header:
+                    key: x-local-rate-limit
+                    value: 'true'

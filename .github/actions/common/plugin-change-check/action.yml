@@ -932,13 +932,13 @@ runs:
         # ==========dynamic config service is needed to test?==========
         if [ ${{ env.sermantAgentCoreDynamicConfigServiceChanged }} == 'true' -o \
             ${{ steps.changed-common-action.outputs.changed }} == 'true' -o ${{ env.triggerPushEvent }} == 'true' ];then
-         echo "enableDynamicConfigServicAction=true" >> $GITHUB_ENV
+         echo "enableDynamicConfigServiceAction=true" >> $GITHUB_ENV
         fi
 
         # ==========xds service is needed to test?==========
         if [ ${{ env.sermantAgentCoreXdsServiceChanged }} == 'true' -o \
             ${{ steps.changed-common-action.outputs.changed }} == 'true' -o ${{ env.triggerPushEvent }} == 'true' ];then
-         echo "enableXdsServicAction=true" >> $GITHUB_ENV
+         echo "enableXdsServiceAction=true" >> $GITHUB_ENV
         fi
 
         # ==========mq grayscale rocketmq is needed to test?==========
@@ -946,4 +946,11 @@ runs:
             ${{ env.sermantAgentCoreChanged }} == 'true' -o \
             ${{ steps.changed-common-action.outputs.changed }} == 'true' -o ${{ env.triggerPushEvent }} == 'true' ];then
          echo "enableMqGrayscaleRocketMqAction=true" >> $GITHUB_ENV
+        fi
+
+        # ==========xds service is needed to test?==========
+        if [ ${{ env.sermantAgentCoreXdsServiceChanged }} == 'true' -o \
+            ${{ steps.changed-common-action.outputs.changed }} == 'true' -o ${{ env.triggerPushEvent }} == 'true' -o \
+            ${{ env.sermantFlowcontrolChanged }} == 'true'];then
+         echo "enableXdsFlowControl=true" >> $GITHUB_ENV
         fi

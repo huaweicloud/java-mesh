@@ -1,0 +1,50 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: spring-server-virtual-service-ratelimit
+spec:
+  hosts:
+  - spring-server
+  http:
+  - name: "testRateLimitV1"
+    match:
+    - headers:
+        version:
+          exact: v1
+      uri:
+        exact: /testRateLimit
+      ignoreUriCase: false
+    route:
+    - destination:
+        host: spring-server
+        subset: v1
+        port:
+          number: 8081
+  - name: "testRateLimitV2"
+    match:
+      - headers:
+          version:
+            exact: v2
+        uri:
+          exact: /testRateLimit
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+  - name: "testRateLimitV3"
+    match:
+      - headers:
+          version:
+            exact: v3
+        uri:
+          exact: /testRateLimit
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081

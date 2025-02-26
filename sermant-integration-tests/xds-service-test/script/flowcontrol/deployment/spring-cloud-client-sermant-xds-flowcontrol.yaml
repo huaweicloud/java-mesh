@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-cloud-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-cloud-client
+  template:
+    metadata:
+      labels:
+        app: spring-cloud-client
+    spec:
+      containers:
+      - name: spring-cloud-client
+        image: spring-cloud-client:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8082
+        env:
+        - name: agent_service_dynamic_config_enable
+          value: "false"
+        - name: agent_service_xds_service_enable
+          value: "true"
+        - name: xds_flow_control_config_enable
+          value: "true"
+        - name: ZOOKEEPER_IP
+          value: "zookeeper.default.svc.cluster.local"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/home/agent/sermant-agent.jar"
+      imagePullSecrets:
+        - name: default-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-cloud-client
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8082
+    targetPort: 8082
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-cloud-client

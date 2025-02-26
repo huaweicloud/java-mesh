@@ -22,6 +22,7 @@ on:
       - '.github/actions/common/exit/action.yml'
       - 'sermant-plugins/sermant-router/router-common/**'
       - 'sermant-plugins/sermant-router/spring-router-plugin/**'
+      - 'sermant-plugins/sermant-flowcontrol/**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.head_ref }}
   cancel-in-progress: true
@@ -39,15 +40,16 @@ jobs:
       - name: set-outputs
         id: set-outputs
         run: |
-          echo "enableDynamicConfigServicAction=${{env.enableDynamicConfigServicAction}}" >> $GITHUB_OUTPUT
-          echo "enableXdsServicAction=${{env.enableXdsServicAction}}" >> $GITHUB_OUTPUT
+          echo "enableDynamicConfigServiceAction=${{env.enableDynamicConfigServiceAction}}" >> $GITHUB_OUTPUT
+          echo "enableXdsServiceAction=${{env.enableXdsServiceAction}}" >> $GITHUB_OUTPUT
+          echo "enableXdsFlowControl=${{env.enableXdsFlowControl}}" >> $GITHUB_OUTPUT
     outputs:
-      enableDynamicConfigServicAction: ${{ steps.set-outputs.outputs.enableDynamicConfigServicAction }}
-      enableXdsServicAction: ${{ steps.set-outputs.outputs.enableXdsServicAction }}
+      enableDynamicConfigServiceAction: ${{ steps.set-outputs.outputs.enableDynamicConfigServiceAction }}
+      enableXdsServiceAction: ${{ steps.set-outputs.outputs.enableXdsServiceAction }}
   download-midwares-and-cache:
     name: download midwares and cache
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableDynamicConfigServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableDynamicConfigServiceAction == 'true'
     needs: [ set-execution-conditions ]
     steps:
       - uses: actions/checkout@v4
@@ -87,7 +89,7 @@ jobs:
   build-agent-and-cache:
     name: build agent and cache
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableDynamicConfigServicAction == 'true' || needs.set-execution-conditions.outputs.enableXdsServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableDynamicConfigServiceAction == 'true' || needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
     needs: [set-execution-conditions]
     steps:
       - uses: actions/checkout@v4
@@ -126,7 +128,7 @@ jobs:
   test-for-agentcore-dynamic-config:
     name: Test for agentcore dynamic config
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableDynamicConfigServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableDynamicConfigServiceAction == 'true'
     needs: [ set-execution-conditions, build-agent-and-cache, download-midwares-and-cache ]
     strategy:
       matrix:
@@ -150,7 +152,7 @@ jobs:
   test-for-xds-service-discovery-onlysermant:
     name: Test for xds service discovery with only sermant
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableXdsServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
     needs: [set-execution-conditions, build-agent-and-cache]
     steps:
       - uses: actions/checkout@v4
@@ -166,7 +168,7 @@ jobs:
   test-for-xds-service-discovery-with-server-envoy:
     name: Test for xds service discovery with spring-server using envoy
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableXdsServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
     needs: [set-execution-conditions, build-agent-and-cache]
     steps:
       - uses: actions/checkout@v4
@@ -182,7 +184,7 @@ jobs:
   test-for-xds-service-discovery-with-client-envoy:
     name: Test for xds service discovery with spring-client using enovy
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableXdsServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
     needs: [set-execution-conditions, build-agent-and-cache]
     steps:
       - uses: actions/checkout@v4
@@ -198,7 +200,7 @@ jobs:
   test-for-xds-router-lb:
     name: Test for xds router and lb with router plugin
     runs-on: ubuntu-latest
-    if: needs.set-execution-conditions.outputs.enableXdsServicAction == 'true'
+    if: needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
     needs: [set-execution-conditions, build-agent-and-cache]
     strategy:
       matrix:
@@ -264,3 +266,73 @@ jobs:
         uses: ./.github/actions/common/xds-service
       - name: xds router and lb test
         uses: ./.github/actions/scenarios/xds-service/xds-router-lb
+  test-for-xds-flowcontrol:
+    name: Test for xds flow control
+    runs-on: ubuntu-latest
+    if: needs.set-execution-conditions.outputs.enableXdsServiceAction == 'true'
+      || needs.set-execution-conditions.outputs.enableXdsFlowControl == 'true'
+    needs: [ set-execution-conditions, build-agent-and-cache ]
+    strategy:
+      matrix:
+        include:
+          - springBootVersion: "2.0.2.RELEASE"
+            snakeyamlVersion: "1.19"
+            springCloudVersion: "Finchley.RELEASE"
+            httpClientVersion: "4.4"
+            okHttp2Version: "2.2.0"
+            okHttp3Version: "3.5.0"
+            httpAsyncClientVersion: "4.0.1"
+          - springBootVersion: "2.1.0.RELEASE"
+            snakeyamlVersion: "1.23"
+            springCloudVersion: "Greenwich.RELEASE"
+            httpClientVersion: "4.4.1"
+            okHttp2Version: "2.3.0"
+            okHttp3Version: "3.9.1"
+            httpAsyncClientVersion: "4.0.2"
+          - springBootVersion: "2.2.0.RELEASE"
+            snakeyamlVersion: "1.25"
+            springCloudVersion: "Hoxton.RELEASE"
+            httpClientVersion: "4.5"
+            okHttp2Version: "2.4.0"
+            okHttp3Version: "3.12.13"
+            httpAsyncClientVersion: "4.1"
+          - springBootVersion: "2.3.0.RELEASE"
+            snakeyamlVersion: "1.26"
+            springCloudVersion: "Hoxton.RELEASE"
+            httpClientVersion: "4.5.3"
+            okHttp2Version: "2.5.0"
+            okHttp3Version: "3.14.9"
+            httpAsyncClientVersion: "4.1.1"
+          - springBootVersion: "2.4.0"
+            snakeyamlVersion: "1.27"
+            springCloudVersion: "2020.0.0"
+            httpClientVersion: "4.5.7"
+            okHttp2Version: "2.6.0"
+            okHttp3Version: "4.2.2"
+            httpAsyncClientVersion: "4.1.2"
+          - springBootVersion: "2.6.2"
+            snakeyamlVersion: "1.29"
+            springCloudVersion: "2021.0.0"
+            httpClientVersion: "4.5.10"
+            okHttp2Version: "2.7.3"
+            okHttp3Version: "4.7.2"
+            httpAsyncClientVersion: "4.1.3"
+          - springBootVersion: "2.7.17"
+            snakeyamlVersion: "1.30"
+            springCloudVersion: "2021.0.3"
+            httpClientVersion: "4.5.13"
+            okHttp2Version: "2.7.5"
+            okHttp3Version: "4.12.0"
+            httpAsyncClientVersion: "4.1.5"
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+      - name: set java version to environment
+        run: |
+          echo "javaVersion=8" >> $GITHUB_ENV
+      - name: xds common operation
+        uses: ./.github/actions/common/xds-service
+      - name: xds flow control test
+        uses: ./.github/actions/scenarios/xds-service/xds-flowcontrol

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spring-client
+  template:
+    metadata:
+      labels:
+        app: spring-client
+    spec:
+      containers:
+      - name: spring-client
+        image: spring-client:1.0.0
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: agent_service_dynamic_config_enable
+          value: "false"
+        - name: agent_service_xds_service_enable
+          value: "true"
+        - name: xds_flow_control_config_enable
+          value: "true"
+        - name: xds_service_discovery_enabled
+          value: "false"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-javaagent:/home/agent/sermant-agent.jar"
+      imagePullSecrets:
+        - name: default-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-client
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: spring-client

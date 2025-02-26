@@ -1,0 +1,122 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: spring-server-virtual-service-fault
+spec:
+  hosts:
+  - spring-server
+  http:
+  - name: "testDelayV1"
+    match:
+    - headers:
+        version:
+          exact: v1
+      uri:
+        exact: /testFault
+      ignoreUriCase: false
+    route:
+    - destination:
+        host: spring-server
+        subset: v1
+        port:
+          number: 8081
+    fault:
+      delay:
+        percentage:
+          value: 0
+        fixedDelay: 5s
+  - name: "testDelayV2"
+    match:
+      - headers:
+          version:
+            exact: v2
+        uri:
+          exact: /testFault
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+    fault:
+      delay:
+        percentage:
+          value: 50
+        fixedDelay: 5s
+  - name: "testDelayV3"
+    match:
+      - headers:
+          version:
+            exact: v3
+        uri:
+          exact: /testFault
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+    fault:
+      delay:
+        percentage:
+          value: 100
+        fixedDelay: 5s
+  - name: "testAboutV1"
+    match:
+      - headers:
+          version:
+            exact: v4
+        uri:
+          exact: /testFault
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+    fault:
+      abort:
+        percentage:
+          value: 0
+        httpStatus: 400
+  - name: "testAboutV2"
+    match:
+      - headers:
+          version:
+            exact: v5
+        uri:
+          exact: /testFault
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+    fault:
+      abort:
+        percentage:
+          value: 50
+        httpStatus: 400
+  - name: "testAboutV3"
+    match:
+      - headers:
+          version:
+            exact: v6
+        uri:
+          exact: /testFault
+        ignoreUriCase: false
+    route:
+      - destination:
+          host: spring-server
+          subset: v1
+          port:
+            number: 8081
+    fault:
+      abort:
+        percentage:
+          value: 100
+        httpStatus: 400

@@ -7,3 +7,6 @@ spring:
       enabled: ${ZOOKEEPER_ENABLED:false}
 server:
   port: 8081
+connectTimeout: 5000
+retryTimeout: 10000
+statusCode: 200

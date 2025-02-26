@@ -59,6 +59,7 @@
         <profile>
             <id>xds-discovery</id>
             <modules>
+                <module>spring-common</module>
                 <module>spring-client</module>
                 <module>spring-server</module>
             </modules>
@@ -66,6 +67,16 @@
         <profile>
             <id>xds-router-lb</id>
             <modules>
+                <module>spring-common</module>
+                <module>spring-client</module>
+                <module>spring-server</module>
+                <module>spring-cloud-client</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>xds-flowcontrol</id>
+            <modules>
+                <module>spring-common</module>
                 <module>spring-client</module>
                 <module>spring-server</module>
                 <module>spring-cloud-client</module>
